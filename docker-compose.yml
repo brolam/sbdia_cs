@@ -1,0 +1,10 @@
+version: "3"
+services:
+  sbdia-dev-core:
+    build: .
+    ports:
+      - "6010:6010"
+    volumes:
+      - ./:/sbdia_cs
+    stdin_open: true
+    tty: true
