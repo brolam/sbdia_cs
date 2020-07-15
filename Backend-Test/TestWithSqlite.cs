@@ -1,0 +1,46 @@
+using System;
+using Backend.Data;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using IdentityServer4.EntityFramework.Options;
+using Microsoft.Extensions.Options;
+
+namespace Backend.Test
+{
+    public class OperationalStoreOptionsMigrations :IOptions<OperationalStoreOptions>
+    {
+        public OperationalStoreOptions Value => new OperationalStoreOptions()
+        {
+            DeviceFlowCodes = new TableConfiguration("DeviceCodes"),
+            EnableTokenCleanup = false,
+            PersistedGrants = new TableConfiguration("PersistedGrants"),
+            TokenCleanupBatchSize = 100,
+            TokenCleanupInterval = 3600,
+        };
+    }
+    public abstract class TestWithSqlite : IDisposable
+    {
+        private const string InMemoryConnectionString = "DataSource=:memory:";
+        private readonly SqliteConnection _connection;
+
+        protected readonly ApplicationDbContext DbContext;
+
+        protected TestWithSqlite()
+        {
+            var storeOptions = new OperationalStoreOptionsMigrations();
+            _connection = new SqliteConnection(InMemoryConnectionString);
+            _connection.Open();
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                    .UseSqlite(_connection)
+                    .Options;
+
+            DbContext = new ApplicationDbContext(options, storeOptions);
+            DbContext.Database.EnsureCreated();
+        }
+
+        public void Dispose()
+        {
+            _connection.Close();
+        }
+    }
+}
