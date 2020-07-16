@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -27,5 +28,6 @@ namespace Backend.Models
         public float LogDurationMode { get; set; } = 14.00f;
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid SecretApiToken { get; set; } = Guid.NewGuid();
+        public List<SensorCost> Costs { get; set; }
     }
 }

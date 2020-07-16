@@ -17,7 +17,7 @@ namespace Backend.Test
         }
 
         [Theory, InlineData("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog)]
-        public void CreateSensor(string userEmail, string sensorName, SensorTypes sensorType)
+        public Sensor CreateSensor(string userEmail, string sensorName, SensorTypes sensorType)
         {
             var user = CreateUser(userEmail);
             var sensor = new Sensor() { Name = sensorName, SensorType = sensorType, Owner = user };
@@ -26,6 +26,7 @@ namespace Backend.Test
             var userSensors = this.DbContext.Users.Find(user.Id).Sensors;
             Assert.Equal(userSensors.Count, user.Sensors.Count);
             Assert.Equal(userSensors[0].Id, sensor.Id);
+            return sensor;
         }
 
         [Fact]
@@ -33,6 +34,24 @@ namespace Backend.Test
         {
             Assert.Throws<Microsoft.EntityFrameworkCore.DbUpdateException>(
                 () => CreateSensor("UserWithSensor@sbdia.iot", null, SensorTypes.EnergyLog)
+            );
+        }
+
+        [Theory, InlineData("$", 0.6F)]
+        public void CreateSensorCost(string title, float value)
+        {
+            var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
+            var cost = new SensorCost() {Title= title, Sensor= sensor, Value=value};
+            this.DbContext.Add(cost);
+            this.DbContext.SaveChanges();
+            Assert.Equal(sensor.Costs[0], cost );
+        }
+
+        [Fact]
+        public void CreateSensorCostWithoutTitle()
+        {
+            Assert.Throws<Microsoft.EntityFrameworkCore.DbUpdateException>(
+                () => CreateSensorCost(null, 0.6F)
             );
         }
     }
