@@ -1,5 +1,7 @@
 using Xunit;
 using Backend.Models;
+using System;
+using System.Linq;
 
 namespace Backend.Test
 {
@@ -41,10 +43,10 @@ namespace Backend.Test
         public void CreateSensorCost(string title, float value)
         {
             var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
-            var cost = new SensorCost() {Title= title, Sensor= sensor, Value=value};
+            var cost = new SensorCost() { Title = title, Sensor = sensor, Value = value };
             this.DbContext.Add(cost);
             this.DbContext.SaveChanges();
-            Assert.Equal(sensor.Costs[0], cost );
+            Assert.Equal(sensor.Costs[0], cost);
         }
 
         [Fact]
@@ -54,5 +56,32 @@ namespace Backend.Test
                 () => CreateSensorCost(null, 0.6F)
             );
         }
+
+        [Theory, InlineData(2020, 7, 17, 12)]
+        public void CreateSensorDimTime(int year, int month, int day, int hour)
+        {
+            var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
+            var dateTime = new DateTime(year, month, day, hour, 0, 0);
+            var dimTime = new SensorDimTime() { DateTime = dateTime, Sensor = sensor };
+            this.DbContext.Add(dimTime);
+            this.DbContext.SaveChanges();
+            var sensorDimTime = sensor.SensorDimTimes.First();
+            Assert.Equal(year, sensorDimTime.Year);
+            Assert.Equal(month, sensorDimTime.Month);
+            Assert.Equal(day, sensorDimTime.Day);
+            Assert.Equal(DayOfWeek.Friday, sensorDimTime.DayOfWeek);
+            Assert.Equal(PeriodOfDayTypes.Morning, sensorDimTime.PeriodOfDay);
+        }
+
+        [Fact]
+        public void SensorDimTimeGetPeriodOfDayFromHour(){
+            Assert.Equal(PeriodOfDayTypes.EarlyMorning, SensorDimTime.GetPeriodOfDayFromHour(5));
+            Assert.Equal(PeriodOfDayTypes.Morning, SensorDimTime.GetPeriodOfDayFromHour(9));
+            Assert.Equal(PeriodOfDayTypes.Noon, SensorDimTime.GetPeriodOfDayFromHour(13));
+            Assert.Equal(PeriodOfDayTypes.Eve, SensorDimTime.GetPeriodOfDayFromHour(17));
+            Assert.Equal(PeriodOfDayTypes.Night, SensorDimTime.GetPeriodOfDayFromHour(21));
+            Assert.Equal(PeriodOfDayTypes.LateNight, SensorDimTime.GetPeriodOfDayFromHour(3));
+        }
+
     }
 }

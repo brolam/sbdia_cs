@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200716205638_CreateSensorCost")]
+    [Migration("20200717190305_CreateSensorCost")]
     partial class CreateSensorCost
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -124,7 +124,7 @@ namespace Backend.Data.Migrations
 
             modelBuilder.Entity("Backend.Models.SensorCost", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 

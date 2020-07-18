@@ -29,5 +29,6 @@ namespace Backend.Models
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid SecretApiToken { get; set; } = Guid.NewGuid();
         public List<SensorCost> Costs { get; set; }
+        public List<SensorDimTime> SensorDimTimes { get; set; }
     }
 }

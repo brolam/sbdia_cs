@@ -122,7 +122,7 @@ namespace Backend.Data.Migrations
 
             modelBuilder.Entity("Backend.Models.SensorCost", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 

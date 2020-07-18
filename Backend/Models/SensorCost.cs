@@ -7,7 +7,7 @@ namespace Backend.Models
     public class SensorCost
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public long Id { get; set; }
         [Required]
         public Sensor Sensor { get; set; }
         [Required, MaxLength(15)]

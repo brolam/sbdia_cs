@@ -11,7 +11,7 @@ namespace Backend.Data.Migrations
                 name: "SensorCost",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     SensorId = table.Column<Guid>(nullable: false),
                     Title = table.Column<string>(maxLength: 15, nullable: false),
