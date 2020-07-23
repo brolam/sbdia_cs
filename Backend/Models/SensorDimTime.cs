@@ -17,6 +17,18 @@ namespace Backend.Models
     {
         private DateTime dateTime;
 
+        public SensorDimTime()
+        {
+        }
+        public SensorDimTime(long unixTimeSeconds, Sensor sensor)
+        {
+            this.Sensor = sensor;
+            DateTime dtUnixTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            dtUnixTime = dtUnixTime.AddSeconds(unixTimeSeconds);
+            TimeZoneInfo sensorTimeZone = TimeZoneInfo.FindSystemTimeZoneById(Sensor.TimeZone);
+            this.DateTime = TimeZoneInfo.ConvertTimeFromUtc(dtUnixTime, sensorTimeZone);
+        }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
         [Required]

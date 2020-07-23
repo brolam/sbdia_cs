@@ -74,13 +74,30 @@ namespace Backend.Test
         }
 
         [Fact]
-        public void SensorDimTimeGetPeriodOfDayFromHour(){
+        public void SensorDimTimeGetPeriodOfDayFromHour()
+        {
             Assert.Equal(PeriodOfDayTypes.EarlyMorning, SensorDimTime.GetPeriodOfDayFromHour(5));
             Assert.Equal(PeriodOfDayTypes.Morning, SensorDimTime.GetPeriodOfDayFromHour(9));
             Assert.Equal(PeriodOfDayTypes.Noon, SensorDimTime.GetPeriodOfDayFromHour(13));
             Assert.Equal(PeriodOfDayTypes.Eve, SensorDimTime.GetPeriodOfDayFromHour(17));
             Assert.Equal(PeriodOfDayTypes.Night, SensorDimTime.GetPeriodOfDayFromHour(21));
             Assert.Equal(PeriodOfDayTypes.LateNight, SensorDimTime.GetPeriodOfDayFromHour(3));
+        }
+
+        [Theory, InlineData(1595288285, 2020, 07, 20, 20, DayOfWeek.Monday, PeriodOfDayTypes.Eve)]
+        public void CreateSensorDimTimeFromUnixTime(long unixTime, int year, int month, int day, int hour, DayOfWeek dayOfWeek, PeriodOfDayTypes periodOfDayType)
+        {
+            var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
+            var dimTime = new SensorDimTime(unixTime, sensor);
+            this.DbContext.Add(dimTime);
+            this.DbContext.SaveChanges();
+            var sensorDimTime = sensor.SensorDimTimes.First();
+            Assert.Equal(year, sensorDimTime.Year);
+            Assert.Equal(month, sensorDimTime.Month);
+            Assert.Equal(day, sensorDimTime.Day);
+            Assert.Equal(hour, sensorDimTime.Hour);
+            Assert.Equal(dayOfWeek, sensorDimTime.DayOfWeek);
+            Assert.Equal(periodOfDayType, sensorDimTime.PeriodOfDay);
         }
 
     }
