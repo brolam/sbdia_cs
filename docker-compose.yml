@@ -3,8 +3,12 @@ services:
   sbdia-dev-core:
     build: .
     ports:
-      - "6010:6010"
+      - '5000:5000'
+      - '5001:5001'
     volumes:
       - ./:/sbdia_cs
+      - '/sbdia_cs/Backend/ClientApp/node_modules'
+    environment:
+      - NODE_ENV=development
     stdin_open: true
     tty: true
