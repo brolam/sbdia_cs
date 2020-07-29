@@ -8,6 +8,7 @@ using Backend.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Backend.Models.Dtos;
 
 namespace Backend.Test
 {
@@ -33,6 +34,18 @@ namespace Backend.Test
             var actionResult = _controller.GetSensorAll();
             // Assert
             Assert.Null(actionResult.Result);
+        }
+
+        [Fact]
+        public void CreateSensor()
+        {
+            // Act
+            var sensorItemDto = new SensorItemDto() { Name = "Sensor 01", SensorType = SensorTypes.EnergyLog };
+            var actionResult = _controller.CreateSensor(sensorItemDto);
+            var sensorItemDtoResult = Assert.IsType<SensorItemDto>(((CreatedAtActionResult)actionResult.Result).Value);
+            // Assert
+            Assert.NotEmpty(sensorItemDtoResult.Id);
+            Assert.Equal(sensorItemDto.Name, sensorItemDtoResult.Name);
         }
     }
 }
