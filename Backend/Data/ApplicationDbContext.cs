@@ -29,5 +29,13 @@ namespace Backend.Data
             }; 
             return sensors.ToArray();
         }
+        
+        public Sensor CreateSensor(string userId, SensorItemDto sensorItemDto){
+            var owner = this.Users.Find(userId);
+            var sensor = new Sensor() { Owner = owner, Name = sensorItemDto.Name, SensorType = sensorItemDto.SensorType };
+            this.Add(sensor);
+            this.SaveChanges();
+            return sensor;
+        }
     }
 }

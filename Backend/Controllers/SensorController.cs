@@ -50,15 +50,14 @@ namespace Backend.Controllers
         public ActionResult<SensorItemDto> CreateSensor(SensorItemDto sensorItemDto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var owner = this._dbContext.Users.Find(userId);
-            var sensor = new Sensor() { Owner = owner, Name = sensorItemDto.Name, SensorType = sensorItemDto.SensorType };
-            this._dbContext.Add(sensor);
-            this._dbContext.SaveChanges();
+            var sensor = this._dbContext.CreateSensor(userId, sensorItemDto);
             return CreatedAtAction(nameof(GetSensor), new { id = sensor.Id }, ToSensorItemDto(sensor));
         }
 
-        private static SensorItemDto ToSensorItemDto(Sensor sensor){
-            return new SensorItemDto(){
+        private static SensorItemDto ToSensorItemDto(Sensor sensor)
+        {
+            return new SensorItemDto()
+            {
                 Id = sensor.Id.ToString(),
                 Name = sensor.Name,
                 SensorType = sensor.SensorType
@@ -66,6 +65,6 @@ namespace Backend.Controllers
         }
     }
 
-    
+
 
 }
