@@ -37,7 +37,7 @@ namespace Backend.Test
         }
 
         [Fact]
-        public void CreateSensor()
+        public SensorItemDto CreateSensor()
         {
             // Act
             var sensorItemDto = new SensorItemDto() { Name = "Sensor 01", SensorType = SensorTypes.EnergyLog };
@@ -46,6 +46,17 @@ namespace Backend.Test
             // Assert
             Assert.NotEmpty(sensorItemDtoResult.Id);
             Assert.Equal(sensorItemDto.Name, sensorItemDtoResult.Name);
+            return sensorItemDtoResult;
+        }
+
+        [Fact]
+        public void GetSensor()
+        {
+            //Act
+            var createSensor = this.CreateSensor();
+            var actionResult = _controller.GetSensor(createSensor.Id);
+            //Assert
+            Assert.Equal(createSensor.Id, actionResult.Value.Id);
         }
     }
 }
