@@ -16,7 +16,7 @@ namespace Backend.Data
         {
         }
 
-        public DbSet<Sensor> Sensor { get; set; }
+        private DbSet<Sensor> Sensor { get; set; }
 
         public SensorItemDto[] GetSensors(string onwerId)
         {
@@ -36,6 +36,18 @@ namespace Backend.Data
             this.Add(sensor);
             this.SaveChanges();
             return sensor;
+        }
+
+        public SensorItemDto GetSensor(string id)
+        {
+            var sensors = from sensor in this.Sensor
+            .Where(sensor => sensor.Id == System.Guid.Parse(id))
+            select new SensorItemDto(){
+                Id = sensor.Id.ToString(),
+                Name = sensor.Name,
+                SensorType = sensor.SensorType
+            }; 
+            return sensors.First();
         }
     }
 }

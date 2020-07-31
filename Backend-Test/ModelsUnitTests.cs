@@ -22,12 +22,10 @@ namespace Backend.Test
         public Sensor CreateSensor(string userEmail, string sensorName, SensorTypes sensorType)
         {
             var user = CreateUser(userEmail);
-            var sensor = new Sensor() { Name = sensorName, SensorType = sensorType, Owner = user };
-            this.DbContext.Add(sensor);
-            this.DbContext.SaveChanges();
-            var userSensors = this.DbContext.Users.Find(user.Id).Sensors;
-            Assert.Equal(userSensors.Count, user.Sensors.Count);
-            Assert.Equal(userSensors[0].Id, sensor.Id);
+            var sensor = this.DbContext.CreateSensor(user.Id, new Models.Dtos.SensorItemDto() { Name = sensorName, SensorType = sensorType});
+            var userSensors = this.DbContext.GetSensors(user.Id);
+            Assert.NotEmpty(userSensors);
+            Assert.Equal(userSensors[0].Id, sensor.Id.ToString());
             return sensor;
         }
 

@@ -33,11 +33,7 @@ namespace Backend.Controllers
         public ActionResult<SensorItemDto> GetSensor(string id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var sensor = this._dbContext.Sensor
-            .Where(sensor => (sensor.OwnerId == userId) & (sensor.Id == Guid.Parse(id)))
-            .Select(sensor => ToSensorItemDto(sensor))
-            .First();
-
+            var sensor = this._dbContext.GetSensor(id);
             if (sensor == null)
             {
                 return NotFound();

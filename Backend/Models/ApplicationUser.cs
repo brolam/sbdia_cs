@@ -8,6 +8,5 @@ namespace Backend.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public List<Sensor> Sensors { get; set; }
     }
 }
