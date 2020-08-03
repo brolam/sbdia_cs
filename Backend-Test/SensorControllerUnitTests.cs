@@ -15,14 +15,14 @@ namespace Backend.Test
 
     public class SensorControllerUnitTests : TestWithSqlite
     {
-        private readonly ApplicationUser _user;
+        private readonly Owner _owner;
         private readonly SensorController _controller;
         public SensorControllerUnitTests()
         {
-            _user = new Models.ApplicationUser() { Email = "UserWithSensor@sbdia.iot" };
-            base.DbContext.Add(_user);
+            this._owner = new Models.Owner() { Email = "UserWithSensor@sbdia.iot" };
+            base.DbContext.Add(_owner);
             base.DbContext.SaveChanges();
-            var claimsUser = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim(ClaimTypes.NameIdentifier, this._user.Id) }, "mock"));
+            var claimsUser = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim(ClaimTypes.NameIdentifier, this._owner.Id) }, "mock"));
             _controller = new SensorController(this.DbContext);
             _controller.ControllerContext = new ControllerContext() { HttpContext = new DefaultHttpContext() { User = claimsUser } };
         }

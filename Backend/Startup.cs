@@ -27,15 +27,15 @@ namespace Backend
         public void ConfigureServices(IServiceCollection services)
         {
             string defaultConnection = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlite(defaultConnection)
             );
             
-            services.AddDefaultIdentity<ApplicationUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddDefaultIdentity<Owner>()
+                .AddEntityFrameworkStores<AppDbContext>();
 
             services.AddIdentityServer()
-                .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+                .AddApiAuthorization<Owner, AppDbContext>();
 
             services.AddAuthentication()
                 .AddIdentityServerJwt();

@@ -23,18 +23,18 @@ namespace Backend.Test
         private const string InMemoryConnectionString = "DataSource=:memory:";
         private readonly SqliteConnection _connection;
 
-        protected readonly ApplicationDbContext DbContext;
+        protected readonly AppDbContext DbContext;
 
         protected TestWithSqlite()
         {
             var storeOptions = new OperationalStoreOptionsMigrations();
             _connection = new SqliteConnection(InMemoryConnectionString);
             _connection.Open();
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            var options = new DbContextOptionsBuilder<AppDbContext>()
                     .UseSqlite(_connection)
                     .Options;
 
-            DbContext = new ApplicationDbContext(options, storeOptions);
+            DbContext = new AppDbContext(options, storeOptions);
             DbContext.Database.EnsureCreated();
         }
 

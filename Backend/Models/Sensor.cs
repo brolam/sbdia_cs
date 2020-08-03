@@ -12,11 +12,9 @@ namespace Backend.Models
     public class Sensor
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         [Required] 
         public string OwnerId { get; set; }
-        [Required, ForeignKey("OwnerId")]
-        public virtual ApplicationUser Owner { get; set; }
         public SensorTypes SensorType { get; set; }
         [Required, MaxLength(50)] 
         public string Name { get; set; }
@@ -28,7 +26,5 @@ namespace Backend.Models
         public float LogDurationMode { get; set; } = 14.00f;
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid SecretApiToken { get; set; } = Guid.NewGuid();
-        public List<SensorCost> Costs { get; set; }
-        public List<SensorDimTime> SensorDimTimes { get; set; }
     }
 }

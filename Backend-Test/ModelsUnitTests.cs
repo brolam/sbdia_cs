@@ -1,7 +1,6 @@
 using Xunit;
 using Backend.Models;
 using System;
-using System.Linq;
 
 namespace Backend.Test
 {
@@ -9,9 +8,9 @@ namespace Backend.Test
     {
 
         [Theory, InlineData("UserWithSensor@sbdia.iot")]
-        public Models.ApplicationUser CreateUser(string email)
+        public Models.Owner CreateUser(string email)
         {
-            var newUser = new Models.ApplicationUser() { Email = email };
+            var newUser = new Models.Owner() { Email = email };
             this.DbContext.Add(newUser);
             this.DbContext.SaveChanges();
             Assert.Equal(email, this.DbContext.Users.Find(newUser.Id).Email);
@@ -22,7 +21,7 @@ namespace Backend.Test
         public Sensor CreateSensor(string userEmail, string sensorName, SensorTypes sensorType)
         {
             var user = CreateUser(userEmail);
-            var sensor = this.DbContext.CreateSensor(user.Id, new Models.Dtos.SensorItemDto() { Name = sensorName, SensorType = sensorType});
+            var sensor = this.DbContext.CreateSensor(user.Id, new Models.Dtos.SensorItemDto() { Name = sensorName, SensorType = sensorType });
             var userSensors = this.DbContext.GetSensors(user.Id);
             Assert.NotEmpty(userSensors);
             Assert.Equal(userSensors[0].Id, sensor.Id.ToString());
@@ -41,10 +40,11 @@ namespace Backend.Test
         public void CreateSensorCost(string title, float value)
         {
             var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
-            var cost = new SensorCost() { Title = title, Sensor = sensor, Value = value };
+            var cost = new SensorCost() { Title = title, SensorId = sensor.Id, Value = value };
             this.DbContext.Add(cost);
             this.DbContext.SaveChanges();
-            Assert.Equal(sensor.Costs[0], cost);
+            var savedCost = this.DbContext.GetSensorCost(sensor.Id, cost.Id);
+            Assert.Equal(savedCost.Id, cost.Id);
         }
 
         [Fact]
@@ -59,16 +59,17 @@ namespace Backend.Test
         public void CreateSensorDimTime(int year, int month, int day, int hour)
         {
             var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
+            var sensorCost = this.DbContext.GetLastOrCreateSensorCost(sensor.Id);
             var dateTime = new DateTime(year, month, day, hour, 0, 0);
-            var dimTime = new SensorDimTime() { DateTime = dateTime, Sensor = sensor };
-            this.DbContext.Add(dimTime);
+            var sensorDimTime = new SensorDimTime() { DateTime = dateTime, SensorId = sensor.Id, SensorCostId = sensorCost.Id };
+            this.DbContext.Add(sensorDimTime);
             this.DbContext.SaveChanges();
-            var sensorDimTime = sensor.SensorDimTimes.First();
-            Assert.Equal(year, sensorDimTime.Year);
-            Assert.Equal(month, sensorDimTime.Month);
-            Assert.Equal(day, sensorDimTime.Day);
-            Assert.Equal(DayOfWeek.Friday, sensorDimTime.DayOfWeek);
-            Assert.Equal(PeriodOfDayTypes.Morning, sensorDimTime.PeriodOfDay);
+            var savedSensorDimTime = this.DbContext.GetSensorDimTime(sensor.Id, sensorDimTime.Id);
+            Assert.Equal(year, savedSensorDimTime.Year);
+            Assert.Equal(month, savedSensorDimTime.Month);
+            Assert.Equal(day, savedSensorDimTime.Day);
+            Assert.Equal(DayOfWeek.Friday, savedSensorDimTime.DayOfWeek);
+            Assert.Equal(PeriodOfDayTypes.Morning, savedSensorDimTime.PeriodOfDay);
         }
 
         [Fact]
@@ -86,16 +87,14 @@ namespace Backend.Test
         public void CreateSensorDimTimeFromUnixTime(long unixTime, int year, int month, int day, int hour, DayOfWeek dayOfWeek, PeriodOfDayTypes periodOfDayType)
         {
             var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
-            var dimTime = new SensorDimTime(unixTime, sensor);
-            this.DbContext.Add(dimTime);
-            this.DbContext.SaveChanges();
-            var sensorDimTime = sensor.SensorDimTimes.First();
-            Assert.Equal(year, sensorDimTime.Year);
-            Assert.Equal(month, sensorDimTime.Month);
-            Assert.Equal(day, sensorDimTime.Day);
-            Assert.Equal(hour, sensorDimTime.Hour);
-            Assert.Equal(dayOfWeek, sensorDimTime.DayOfWeek);
-            Assert.Equal(periodOfDayType, sensorDimTime.PeriodOfDay);
+            var sensorDimTime = this.DbContext.GetOrCreateSensorDimTime(unixTime, sensor);
+            var savedSensorDimTime = this.DbContext.GetSensorDimTime(sensor.Id, sensorDimTime.Id);
+            Assert.Equal(year, savedSensorDimTime.Year);
+            Assert.Equal(month, savedSensorDimTime.Month);
+            Assert.Equal(day, savedSensorDimTime.Day);
+            Assert.Equal(hour, savedSensorDimTime.Hour);
+            Assert.Equal(dayOfWeek, savedSensorDimTime.DayOfWeek);
+            Assert.Equal(periodOfDayType, savedSensorDimTime.PeriodOfDay);
         }
 
     }

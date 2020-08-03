@@ -16,23 +16,24 @@ namespace Backend.Models
     public class SensorDimTime
     {
         private DateTime dateTime;
-
         public SensorDimTime()
         {
         }
-        public SensorDimTime(long unixTimeSeconds, Sensor sensor)
+        public SensorDimTime(long unixTimeSeconds, Sensor sensor, long sensorCostId)
         {
-            this.Sensor = sensor;
+            this.SensorId = sensor.Id;
+            this.SensorCostId = sensorCostId;
             DateTime dtUnixTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
             dtUnixTime = dtUnixTime.AddSeconds(unixTimeSeconds);
-            TimeZoneInfo sensorTimeZone = TimeZoneInfo.FindSystemTimeZoneById(Sensor.TimeZone);
+            TimeZoneInfo sensorTimeZone = TimeZoneInfo.FindSystemTimeZoneById(sensor.TimeZone);
             this.DateTime = TimeZoneInfo.ConvertTimeFromUtc(dtUnixTime, sensorTimeZone);
         }
-
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
         [Required]
-        public Sensor Sensor { get; set; }
+        public string SensorId { get; set; }
+        [Required]
+        public long SensorCostId { get; set; }
         [Required]
         public DateTime DateTime { get => dateTime; set => SetDateTime(value); }
         [Required, Range(1900, int.MaxValue)]
@@ -57,7 +58,6 @@ namespace Backend.Models
             this.DayOfWeek = DateTime.DayOfWeek;
             this.PeriodOfDay = GetPeriodOfDayFromHour(this.Hour);
         }
-
         public static PeriodOfDayTypes GetPeriodOfDayFromHour(int hour)
         {
             if ((hour > 4) & (hour <= 8))

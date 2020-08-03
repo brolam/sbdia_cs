@@ -1,6 +1,5 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using Backend.Data;
 using Backend.Models;
@@ -15,9 +14,9 @@ namespace Backend.Controllers
     [Route("api/[controller]")]
     public class SensorController : ControllerBase
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly AppDbContext _dbContext;
 
-        public SensorController(ApplicationDbContext dbContext)
+        public SensorController(AppDbContext dbContext)
         {
             _dbContext = dbContext;
         }

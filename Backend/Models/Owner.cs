@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Backend.Models
 {
-    public class ApplicationUser : IdentityUser
+    public class Owner : IdentityUser
     {
     }
 }

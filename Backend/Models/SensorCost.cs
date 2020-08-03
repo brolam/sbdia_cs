@@ -9,7 +9,7 @@ namespace Backend.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
         [Required]
-        public Sensor Sensor { get; set; }
+        public string SensorId { get; set; }
         [Required, MaxLength(15)]
         public string Title { get; set; }
         [Required]

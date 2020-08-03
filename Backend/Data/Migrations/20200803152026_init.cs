@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Backend.Data.Migrations
 {
-    public partial class CreateApplicationUser : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -186,6 +186,84 @@ namespace Backend.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Sensors",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    OwnerId = table.Column<string>(nullable: false),
+                    SensorType = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(maxLength: 50, nullable: false),
+                    TimeZone = table.Column<string>(maxLength: 200, nullable: false),
+                    DefaultToConvert = table.Column<float>(nullable: false),
+                    LogDurationMode = table.Column<float>(nullable: false),
+                    SecretApiToken = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sensors", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Sensors_AspNetUsers_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SensorCosts",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SensorId = table.Column<string>(nullable: false),
+                    Title = table.Column<string>(maxLength: 15, nullable: false),
+                    Value = table.Column<float>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SensorCosts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SensorCosts_Sensors_SensorId",
+                        column: x => x.SensorId,
+                        principalTable: "Sensors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SensorDimTimes",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SensorId = table.Column<string>(nullable: false),
+                    SensorCostId = table.Column<long>(nullable: false),
+                    DateTime = table.Column<DateTime>(nullable: false),
+                    Year = table.Column<int>(nullable: false),
+                    Month = table.Column<int>(nullable: false),
+                    Day = table.Column<int>(nullable: false),
+                    Hour = table.Column<int>(nullable: false),
+                    DayOfWeek = table.Column<int>(nullable: false),
+                    PeriodOfDay = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SensorDimTimes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SensorDimTimes_SensorCosts_SensorCostId",
+                        column: x => x.SensorCostId,
+                        principalTable: "SensorCosts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_SensorDimTimes_Sensors_SensorId",
+                        column: x => x.SensorId,
+                        principalTable: "Sensors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -243,6 +321,26 @@ namespace Backend.Data.Migrations
                 name: "IX_PersistedGrants_SubjectId_ClientId_Type",
                 table: "PersistedGrants",
                 columns: new[] { "SubjectId", "ClientId", "Type" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SensorCosts_SensorId",
+                table: "SensorCosts",
+                column: "SensorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SensorDimTimes_SensorCostId",
+                table: "SensorDimTimes",
+                column: "SensorCostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SensorDimTimes_SensorId",
+                table: "SensorDimTimes",
+                column: "SensorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sensors_OwnerId",
+                table: "Sensors",
+                column: "OwnerId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -269,7 +367,16 @@ namespace Backend.Data.Migrations
                 name: "PersistedGrants");
 
             migrationBuilder.DropTable(
+                name: "SensorDimTimes");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "SensorCosts");
+
+            migrationBuilder.DropTable(
+                name: "Sensors");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
