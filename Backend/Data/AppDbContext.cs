@@ -113,5 +113,15 @@ namespace Backend.Data
             this.SaveChanges();
             return sensorDimTime;
         }
+
+        public object CreateSensorLogBatch(Sensor sensor, string content)
+        {
+            throw new NotImplementedException();
+        }
+
+        public SensorLogBatch[] GetSensorLogBatchPending(string id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

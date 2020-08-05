@@ -97,5 +97,20 @@ namespace Backend.Test
             Assert.Equal(periodOfDayType, savedSensorDimTime.PeriodOfDay);
         }
 
+        [Fact]
+        public void CreateSensorLogBatchEnergyLog()
+        {
+            //Given
+            var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
+            var content = "1574608324;1;2;3";
+            //When
+            var sensorLogBatch = this.DbContext.CreateSensorLogBatch(sensor, content);
+            var sensorLogBatchshUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
+            //Then
+            Assert.NotEmpty(sensorLogBatchshUnprocessed);
+            Assert.Equal(content, sensorLogBatchshUnprocessed[0].Content);
+            Assert.Equal(0, sensorLogBatchshUnprocessed[0].Attempts);
+        }
+
     }
 }
