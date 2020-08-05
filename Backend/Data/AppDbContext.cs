@@ -19,6 +19,7 @@ namespace Backend.Data
         private DbSet<Sensor> Sensors { get; set; }
         private DbSet<SensorCost> SensorCosts { get; set; }
         private DbSet<SensorDimTime> SensorDimTimes { get; set; }
+        private DbSet<SensorLogBatch> SensorLogBatchs { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -83,7 +84,7 @@ namespace Backend.Data
         public SensorCost GetSensorCost(string sensorId, long id)
         {
             return this.SensorCosts.First(sensorCost => sensorCost.SensorId == sensorId && sensorCost.Id == id);
-         
+
         }
 
         public SensorCost GetLastOrCreateSensorCost(string sensorId)
@@ -103,7 +104,7 @@ namespace Backend.Data
         {
             return this.SensorDimTimes
             .First(sensorCost => sensorCost.SensorId == SensorId && sensorCost.Id == id);
-           
+
         }
         public SensorDimTime GetOrCreateSensorDimTime(long unixTimeSeconds, Sensor sensor)
         {
@@ -116,12 +117,24 @@ namespace Backend.Data
 
         public object CreateSensorLogBatch(Sensor sensor, string content)
         {
-            throw new NotImplementedException();
+            var sensorLogBatch = new SensorLogBatch()
+            {
+                SensorId = sensor.Id,
+                SecretApiToken = sensor.SecretApiToken,
+                Content = content,
+                Attempts = 0
+            };
+            this.SensorLogBatchs.Add(sensorLogBatch);
+            this.SaveChanges();
+            return sensorLogBatch;
         }
 
-        public SensorLogBatch[] GetSensorLogBatchPending(string id)
+        public SensorLogBatch[] GetSensorLogBatchPending(Sensor sensor)
         {
-            throw new NotImplementedException();
+            var sensorLogBatchPending = this.SensorLogBatchs
+            .Where(sensorLogBatch => sensorLogBatch.SensorId.Equals(sensor.Id) && sensorLogBatch.Attempts < 3)
+            .OrderBy(sensorLogBatch => sensorLogBatch.Id);
+            return sensorLogBatchPending.ToArray();
         }
     }
 }

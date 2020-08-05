@@ -105,7 +105,7 @@ namespace Backend.Test
             var content = "1574608324;1;2;3";
             //When
             var sensorLogBatch = this.DbContext.CreateSensorLogBatch(sensor, content);
-            var sensorLogBatchshUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
+            var sensorLogBatchshUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor);
             //Then
             Assert.NotEmpty(sensorLogBatchshUnprocessed);
             Assert.Equal(content, sensorLogBatchshUnprocessed[0].Content);
