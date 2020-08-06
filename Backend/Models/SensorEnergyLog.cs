@@ -9,6 +9,8 @@ namespace Backend.Models
         [Required]
         public string SensorId { get; set; }
         [Required]
+        public long SensorDimTimeId {get; set;}
+        [Required]
         public long UnixTime { get; set; }
         [Required, Range(0.00, float.MaxValue)]
         public float Duration { get; set; }

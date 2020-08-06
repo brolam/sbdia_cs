@@ -130,5 +130,30 @@ namespace Backend.Test
             Assert.Equal(0, sensorLogBatchshUnprocessed[0].Attempts);
         }
 
+        [Fact]
+        public void CreateSensorEnergyLog()
+        {
+            //Given
+            var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
+            var unixTime = 1574608324;
+            var sensorDimTime = this.DbContext.GetOrCreateSensorDimTime(unixTime, sensor);
+            const double Duration = 14.00;
+            const float Watts1 = 1.00F;
+            const float Watts2 = 2.00F;
+            const float Watts3 = 3.00F;
+            const float ConvertToUnits = 0.60F;
+            //When
+            var sensorEnergyLog = this.DbContext.CreateSensorEnergyLog(sensor.Id, sensorDimTime.Id, unixTime, Duration, Watts1, Watts2, Watts3, ConvertToUnits);
+            //Then
+            Assert.True(sensorEnergyLog.Id > 0);
+            Assert.Equal(sensor.Id, sensorEnergyLog.SensorId);
+            Assert.Equal(sensorDimTime.Id, sensorEnergyLog.SensorDimTimeId);
+            Assert.Equal(Duration, sensorEnergyLog.Duration);
+            Assert.Equal(Watts1, sensorEnergyLog.Watts1);
+            Assert.Equal(Watts2, sensorEnergyLog.Watts2);
+            Assert.Equal(Watts3, sensorEnergyLog.Watts3);
+            Assert.Equal(ConvertToUnits, sensorEnergyLog.ConvertToUnits);
+        }
+
     }
 }

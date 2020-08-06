@@ -136,5 +136,10 @@ namespace Backend.Data
             .OrderBy(sensorLogBatch => sensorLogBatch.Id);
             return sensorLogBatchPending.ToArray();
         }
+
+        public SensorEnergyLog CreateSensorEnergyLog(string sensorId, long sensorDimTimeId, long unixTime, double duration, float watts1, float watts2, float watts3, float convertToUnits)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
