@@ -137,7 +137,7 @@ namespace Backend.Test
             var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
             var unixTime = 1574608324;
             var sensorDimTime = this.DbContext.GetOrCreateSensorDimTime(unixTime, sensor);
-            const double Duration = 14.00;
+            const float Duration = 14.00F;
             const float Watts1 = 1.00F;
             const float Watts2 = 2.00F;
             const float Watts3 = 3.00F;

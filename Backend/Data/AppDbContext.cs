@@ -20,6 +20,8 @@ namespace Backend.Data
         private DbSet<SensorCost> SensorCosts { get; set; }
         private DbSet<SensorDimTime> SensorDimTimes { get; set; }
         private DbSet<SensorLogBatch> SensorLogBatchs { get; set; }
+        private DbSet<SensorEnergyLog> SensorEnergyLogs { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -137,9 +139,22 @@ namespace Backend.Data
             return sensorLogBatchPending.ToArray();
         }
 
-        public SensorEnergyLog CreateSensorEnergyLog(string sensorId, long sensorDimTimeId, long unixTime, double duration, float watts1, float watts2, float watts3, float convertToUnits)
+        public SensorEnergyLog CreateSensorEnergyLog(string sensorId, long sensorDimTimeId, long unixTime, float duration, float watts1, float watts2, float watts3, float convertToUnits)
         {
-            throw new NotImplementedException();
+            var createSensorEnergyLog = new SensorEnergyLog(){
+                SensorId = sensorId,
+                SensorDimTimeId = sensorDimTimeId,
+                UnixTime = unixTime,
+                Duration = duration,
+                Watts1 = watts1,
+                Watts2 = watts2,
+                Watts3 = watts3,
+                WattsTotal = watts1 + watts2 + watts3,
+                ConvertToUnits = convertToUnits
+            };
+            this.SensorEnergyLogs.Add(createSensorEnergyLog);
+            this.SaveChanges();
+            return createSensorEnergyLog;
         }
     }
 }

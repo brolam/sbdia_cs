@@ -81,6 +81,44 @@ namespace Backend.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SensorEnergyLogs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SensorId = table.Column<string>(nullable: false),
+                    SensorDimTimeId = table.Column<long>(nullable: false),
+                    UnixTime = table.Column<long>(nullable: false),
+                    Duration = table.Column<float>(nullable: false),
+                    Watts1 = table.Column<float>(nullable: false),
+                    Watts2 = table.Column<float>(nullable: false),
+                    Watts3 = table.Column<float>(nullable: false),
+                    WattsTotal = table.Column<float>(nullable: false),
+                    ConvertToUnits = table.Column<float>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SensorEnergyLogs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SensorLogBatchs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SensorId = table.Column<string>(nullable: false),
+                    SecretApiToken = table.Column<Guid>(nullable: false),
+                    Content = table.Column<string>(nullable: false),
+                    Attempts = table.Column<int>(nullable: false),
+                    Exception = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SensorLogBatchs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -368,6 +406,12 @@ namespace Backend.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "SensorDimTimes");
+
+            migrationBuilder.DropTable(
+                name: "SensorEnergyLogs");
+
+            migrationBuilder.DropTable(
+                name: "SensorLogBatchs");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

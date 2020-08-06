@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200803152026_init")]
+    [Migration("20200806201439_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -188,6 +188,73 @@ namespace Backend.Data.Migrations
                     b.HasIndex("SensorId");
 
                     b.ToTable("SensorDimTimes");
+                });
+
+            modelBuilder.Entity("Backend.Models.SensorEnergyLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<float>("ConvertToUnits")
+                        .HasColumnType("REAL");
+
+                    b.Property<float>("Duration")
+                        .HasColumnType("REAL");
+
+                    b.Property<long>("SensorDimTimeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SensorId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("UnixTime")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<float>("Watts1")
+                        .HasColumnType("REAL");
+
+                    b.Property<float>("Watts2")
+                        .HasColumnType("REAL");
+
+                    b.Property<float>("Watts3")
+                        .HasColumnType("REAL");
+
+                    b.Property<float>("WattsTotal")
+                        .HasColumnType("REAL");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SensorEnergyLogs");
+                });
+
+            modelBuilder.Entity("Backend.Models.SensorLogBatch", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Exception")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("SecretApiToken")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SensorId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SensorLogBatchs");
                 });
 
             modelBuilder.Entity("IdentityServer4.EntityFramework.Entities.DeviceFlowCodes", b =>
