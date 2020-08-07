@@ -156,5 +156,10 @@ namespace Backend.Data
             this.SaveChanges();
             return createSensorEnergyLog;
         }
+
+        public void PerformContentSensorLogBatch(Sensor sensor)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

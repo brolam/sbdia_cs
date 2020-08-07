@@ -116,7 +116,7 @@ namespace Backend.Test
         }
 
         [Fact]
-        public void CreateSensorLogBatchEnergyLog()
+        public (Sensor, SensorLogBatch[]) CreateSensorLogBatchEnergyLog()
         {
             //Given
             var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
@@ -128,6 +128,7 @@ namespace Backend.Test
             Assert.NotEmpty(sensorLogBatchshUnprocessed);
             Assert.Equal(content, sensorLogBatchshUnprocessed[0].Content);
             Assert.Equal(0, sensorLogBatchshUnprocessed[0].Attempts);
+            return (sensor, sensorLogBatchshUnprocessed);
         }
 
         [Fact]
@@ -153,6 +154,19 @@ namespace Backend.Test
             Assert.Equal(Watts2, sensorEnergyLog.Watts2);
             Assert.Equal(Watts3, sensorEnergyLog.Watts3);
             Assert.Equal(ConvertToUnits, sensorEnergyLog.ConvertToUnits);
+        }
+
+        [Fact]
+        public void PerformContentSensorLogBatchEnergyLog()
+        {
+            //Given
+            var (sensor, sensorLogBatchshUnprocessed) = this.CreateSensorLogBatchEnergyLog();
+            //When
+            Assert.NotEmpty(sensorLogBatchshUnprocessed);
+            this.DbContext.PerformContentSensorLogBatch(sensor);
+            sensorLogBatchshUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor);
+            //Then
+            Assert.Empty(sensorLogBatchshUnprocessed);
         }
 
     }
