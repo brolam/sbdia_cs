@@ -1,0 +1,30 @@
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS base
+# Define working directory
+WORKDIR /app
+ARG BUILD_CONFIGURATION=Release
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true  
+ENV ASPNETCORE_URLS=http://+:80  
+EXPOSE 80
+
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+WORKDIR /src
+ARG BUILD_CONFIGURATION=Release
+ENV ASPNETCORE_ENVIRONMENT=Production
+RUN dotnet tool install --global dotnet-ef
+ENV PATH $PATH:/root/.dotnet/tools
+RUN curl https://deb.nodesource.com/setup_12.x | bash -
+RUN apt-get install -y nodejs
+COPY ["Backend/Backend.csproj", "Backend/"]
+RUN dotnet restore "Backend/Backend.csproj"
+COPY . .
+RUN dotnet build "Backend/Backend.csproj" -c Release -o /app/build
+
+FROM build AS publish
+ENV PATH $PATH:/app/ClientApp/node_modules/.bin:$PATH
+RUN dotnet publish "Backend/Backend.csproj" -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "Backend.dll"]

@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  sbdia.backend:
+    image: ${DOCKER_REGISTRY-}sbdiabackend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    build:
+      context: .
+      dockerfile: DockerfileProd
+    ports:
+      - '80:80'

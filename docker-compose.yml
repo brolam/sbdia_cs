@@ -3,8 +3,7 @@ services:
   sbdia-dev-core:
     build: .
     ports:
-      - '5000:5000'
-      - '5001:5001'
+      - '80:80'
     volumes:
       - ./:/sbdia_cs
       - '/sbdia_cs/Backend/ClientApp/node_modules'
