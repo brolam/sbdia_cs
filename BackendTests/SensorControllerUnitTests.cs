@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Backend.Models.Dtos;
 
-namespace Backend.Test
+namespace BackendTest
 {
 
     public class SensorControllerUnitTests : TestWithSqlite

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using IdentityServer4.EntityFramework.Options;
 using Microsoft.Extensions.Options;
 
-namespace Backend.Test
+namespace BackendTest
 {
     public class OperationalStoreOptionsMigrations :IOptions<OperationalStoreOptions>
     {
