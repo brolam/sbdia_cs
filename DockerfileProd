@@ -26,5 +26,8 @@ RUN dotnet publish "Backend/Backend.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
+COPY ["Backend/temp.pfx", "/app"]
 COPY --from=publish /app/publish .
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password=""
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/app/temp.pfx
 ENTRYPOINT ["dotnet", "Backend.dll"]
