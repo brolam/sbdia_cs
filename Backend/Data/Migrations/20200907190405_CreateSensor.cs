@@ -1,9 +1,10 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Backend.Data.Migrations
 {
-    public partial class init : Migration
+    public partial class CreateSensor : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -85,7 +86,7 @@ namespace Backend.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     SensorId = table.Column<string>(nullable: false),
                     SensorDimTimeId = table.Column<long>(nullable: false),
                     UnixTime = table.Column<long>(nullable: false),
@@ -106,7 +107,7 @@ namespace Backend.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     SensorId = table.Column<string>(nullable: false),
                     SecretApiToken = table.Column<Guid>(nullable: false),
                     Content = table.Column<string>(nullable: false),
@@ -123,7 +124,7 @@ namespace Backend.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     RoleId = table.Column<string>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true)
@@ -144,7 +145,7 @@ namespace Backend.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<string>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true)
@@ -253,7 +254,7 @@ namespace Backend.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     SensorId = table.Column<string>(nullable: false),
                     Title = table.Column<string>(maxLength: 15, nullable: false),
                     Value = table.Column<float>(nullable: false)
@@ -274,7 +275,7 @@ namespace Backend.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     SensorId = table.Column<string>(nullable: false),
                     SensorCostId = table.Column<long>(nullable: false),
                     DateTime = table.Column<DateTime>(nullable: false),

@@ -1,5 +1,16 @@
 version: "3"
 services:
+  db:
+     image: mysql:5.7
+     environment:
+       MYSQL_RANDOM_ROOT_PASSWORD: 1
+       MYSQL_DATABASE: sbdia_db_dev
+       MYSQL_USER: dev_db_user
+       MYSQL_PASSWORD: dev_db_user
+     volumes:
+       - dbdata:/var/lib/mysql
+     restart: always
+
   sbdia-dev-core:
     build: .
     ports:
@@ -11,3 +22,5 @@ services:
       - NODE_ENV=development
     stdin_open: true
     tty: true
+volumes:
+    dbdata:

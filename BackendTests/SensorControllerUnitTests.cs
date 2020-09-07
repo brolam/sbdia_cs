@@ -19,7 +19,7 @@ namespace BackendTest
         private readonly SensorController _controller;
         public SensorControllerUnitTests()
         {
-            this._owner = new Models.Owner() { Email = "UserWithSensor@sbdia.iot" };
+            this._owner = new Owner() { Email = "UserWithSensor@sbdia.iot" };
             base.DbContext.Add(_owner);
             base.DbContext.SaveChanges();
             var claimsUser = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim(ClaimTypes.NameIdentifier, this._owner.Id) }, "mock"));
