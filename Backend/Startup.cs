@@ -8,28 +8,22 @@ using Backend.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 
 namespace Backend
 {
     public class Startup
     {
-        private readonly IConfiguration configuration;
-        private readonly IWebHostEnvironment env;
-
-        public Startup(IConfiguration configuration, IWebHostEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            this.configuration = configuration;
-            this.env = env;
+            Configuration = configuration;
         }
+
+        public IConfiguration Configuration { get; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string defaultConnection =
-            env.IsProduction() ?
-                Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
-            :
-                configuration.GetConnectionString("DefaultConnection");
+            string defaultConnection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<AppDbContext>(options =>
                 options.UseMySql(defaultConnection)
             );
