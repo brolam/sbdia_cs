@@ -35,7 +35,7 @@ namespace BackendTest
             return sensor;
         }
 
-        //[Fact]
+        [Fact(Skip = "Need to refactor")]
         public void NotCreateSensorWithoutName()
         {
             //Then
@@ -58,7 +58,7 @@ namespace BackendTest
             Assert.Equal(savedCost.Id, cost.Id);
         }
 
-        //[Fact]
+        [Fact(Skip = "Need to refactor")]
         public void CreateSensorCostWithoutTitle()
         {
             //Then
@@ -157,7 +157,7 @@ namespace BackendTest
             Assert.Equal(ConvertToUnits, sensorEnergyLog.ConvertToUnits);
         }
 
-        //[Fact]
+        [Fact( Skip = "Need to refactor")]
         public void PerformContentSensorLogBatchEnergyLog()
         {
             //Given
