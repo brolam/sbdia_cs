@@ -2,10 +2,11 @@ using Xunit;
 using Backend.Models;
 using Backend.Models.Dtos;
 using System;
+using BackendTests.Mocks;
 
 namespace BackendTest
 {
-    public class ModelsUnitTests : TestWithSqlite
+    public class ModelsUnitTests : AppDbContextMock
     {
 
         [Theory, InlineData("UserWithSensor@sbdia.iot")]
@@ -35,7 +36,7 @@ namespace BackendTest
             return sensor;
         }
 
-        [Fact(Skip = "Need to refactor")]
+        [Fact]
         public void NotCreateSensorWithoutName()
         {
             //Then
@@ -58,7 +59,7 @@ namespace BackendTest
             Assert.Equal(savedCost.Id, cost.Id);
         }
 
-        [Fact(Skip = "Need to refactor")]
+        [Fact]
         public void CreateSensorCostWithoutTitle()
         {
             //Then
@@ -157,7 +158,7 @@ namespace BackendTest
             Assert.Equal(ConvertToUnits, sensorEnergyLog.ConvertToUnits);
         }
 
-        [Fact( Skip = "Need to refactor")]
+        [Fact(Skip="In fault state")]
         public void PerformContentSensorLogBatchEnergyLog()
         {
             //Given

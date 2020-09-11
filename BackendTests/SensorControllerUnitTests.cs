@@ -1,7 +1,4 @@
 
-
-using System.Net;
-using System.Threading.Tasks;
 using Xunit;
 using Backend.Controllers;
 using Backend.Models;
@@ -9,11 +6,11 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Backend.Models.Dtos;
+using BackendTests.Mocks;
 
 namespace BackendTest
 {
-
-    public class SensorControllerUnitTests : TestWithSqlite
+    public class SensorControllerUnitTests : AppDbContextMock
     {
         private readonly Owner _owner;
         private readonly SensorController _controller;

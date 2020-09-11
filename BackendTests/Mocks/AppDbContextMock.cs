@@ -1,12 +1,14 @@
 using System;
 using Backend.Data;
-using Microsoft.EntityFrameworkCore;
+using BackendTest;
 using IdentityServer4.EntityFramework.Options;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace BackendTest
+namespace BackendTests.Mocks
 {
-    public class OperationalStoreOptionsMigrations :IOptions<OperationalStoreOptions>
+    public class OperationalStoreOptionsMigrations : IOptions<OperationalStoreOptions>
     {
         public OperationalStoreOptions Value => new OperationalStoreOptions()
         {
@@ -17,23 +19,26 @@ namespace BackendTest
             TokenCleanupInterval = 3600,
         };
     }
-    public abstract class TestWithSqlite : IDisposable
+    public class AppDbContextMock : IDisposable
     {
+        private const string InMemoryConnectionString = "DataSource=:memory:";
+        private readonly SqliteConnection _connection;
         protected readonly AppDbContext DbContext;
-        protected TestWithSqlite()
+        protected AppDbContextMock()
         {
             var storeOptions = new OperationalStoreOptionsMigrations();
+            _connection = new SqliteConnection(InMemoryConnectionString);
+            _connection.Open();
             var options = new DbContextOptionsBuilder<AppDbContext>()
-                    .UseInMemoryDatabase("sbdia_db")
+                    .UseSqlite(_connection)
                     .Options;
-
             DbContext = new AppDbContext(options, storeOptions);
             DbContext.Database.EnsureCreated();
         }
 
         public void Dispose()
         {
-            //AppDbContext.Dispose();
+            _connection.Close();
         }
     }
 }
