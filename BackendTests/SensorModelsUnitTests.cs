@@ -158,7 +158,7 @@ namespace BackendTest
             Assert.Equal(ConvertToUnits, sensorEnergyLog.ConvertToUnits);
         }
 
-        [Fact(Skip="In fault state")]
+        [Fact]
         public void PerformContentSensorLogBatchEnergyLog()
         {
             //Given
