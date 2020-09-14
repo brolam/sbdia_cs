@@ -167,8 +167,16 @@ namespace BackendTest
             Assert.NotEmpty(sensorLogBatchshUnprocessed);
             this.DbContext.PerformContentSensorLogBatch(sensor);
             sensorLogBatchshUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor);
+            var recentEneryLogs = this.DbContext.GetSensorEnergyLogsRecent(sensor);
             //Then
             Assert.Empty(sensorLogBatchshUnprocessed);
+            Assert.NotEmpty(recentEneryLogs);
+            Assert.Equal(1, recentEneryLogs[0].Id);
+            Assert.Equal(sensor.LogDurationMode, recentEneryLogs[0].Duration);
+            Assert.Equal(sensor.DefaultToConvert * 1, recentEneryLogs[0].Watts1);
+            Assert.Equal(sensor.DefaultToConvert * 2, recentEneryLogs[0].Watts2);
+            Assert.Equal(sensor.DefaultToConvert * 3, recentEneryLogs[0].Watts3);
+            Assert.Equal(sensor.DefaultToConvert * (1 + 2 + 3), recentEneryLogs[0].WattsTotal);
         }
 
     }
