@@ -117,12 +117,12 @@ namespace BackendTest
             Assert.Equal(periodOfDayType, savedSensorDimTime.PeriodOfDay);
         }
 
-        [Fact]
-        public (Sensor, SensorLogBatch[]) CreateSensorLogBatchEnergyLog()
+        [Theory]
+        [InlineData("1574608324;1;2;3")]
+        public (Sensor, SensorLogBatch[]) CreateSensorLogBatchEnergyLog(string content)
         {
             //Given
             var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
-            var content = "1574608324;1;2;3";
             //When
             var sensorLogBatch = this.DbContext.CreateSensorLogBatch(sensor, content);
             var sensorLogBatchshUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor);
@@ -162,7 +162,7 @@ namespace BackendTest
         public void PerformContentSensorLogBatchEnergyLog()
         {
             //Given
-            var (sensor, sensorLogBatchshUnprocessed) = this.CreateSensorLogBatchEnergyLog();
+            var (sensor, sensorLogBatchshUnprocessed) = this.CreateSensorLogBatchEnergyLog("1574608324;1;2;3");
             //When
             Assert.NotEmpty(sensorLogBatchshUnprocessed);
             this.DbContext.PerformContentSensorLogBatch(sensor);
@@ -177,6 +177,25 @@ namespace BackendTest
             Assert.Equal(sensor.DefaultToConvert * 2, recentEneryLogs[0].Watts2);
             Assert.Equal(sensor.DefaultToConvert * 3, recentEneryLogs[0].Watts3);
             Assert.Equal(sensor.DefaultToConvert * (1 + 2 + 3), recentEneryLogs[0].WattsTotal);
+        }
+        [Fact]
+        public void CalculateDurationSensorLogBatchEnergyLog()
+        {
+            //Given
+            var log_at_15_20_00 = "1574608800;1;2;3";
+            var log_end_line = "|";
+            var log_at_15_35_00 = "1574608815;2;3;4";
+            var (sensor, sensorLogBatchshUnprocessed) = this.CreateSensorLogBatchEnergyLog($"{log_at_15_20_00}{log_end_line}{log_at_15_35_00}");
+            //When
+            this.DbContext.PerformContentSensorLogBatch(sensor);
+            var recentEneryLogs = this.DbContext.GetSensorEnergyLogsRecent(sensor);
+            //Then
+            Assert.NotEmpty(recentEneryLogs);
+            Assert.Equal(2, recentEneryLogs.Length);
+            Assert.Equal(sensor.LogDurationMode, recentEneryLogs[1].Duration);
+            Assert.Equal(15, recentEneryLogs[0].Duration);
+            Assert.Equal((2 + 3 + 4) * sensor.DefaultToConvert, recentEneryLogs[0].WattsTotal);
+            Assert.Equal((1 + 2 + 3) * sensor.DefaultToConvert, recentEneryLogs[1].WattsTotal);
         }
 
     }

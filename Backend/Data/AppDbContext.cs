@@ -164,15 +164,13 @@ namespace Backend.Data
                var  sensorLogBatchPending = this.GetSensorLogBatchPending(sensor);
                foreach (var sensorLogBatch in sensorLogBatchPending)
                {
+                   SensorEnergyLog previousLog = null;
                    foreach( var contentLogItem in sensorLogBatch.Content.Split("|"))
                    {
                        var energyLog = SensorEnergyLog.Parse(sensor, ((unixTime) => this.GetOrCreateSensorDimTime(unixTime, sensor).Id) , contentLogItem);
-                       var lastEnergyLog = this.SensorEnergyLogs.Where(log => log.SensorId == sensor.Id).OrderByDescending(log => log.UnixTime).LastOrDefault();
-                       if ( lastEnergyLog != null)
-                       {
-                           lastEnergyLog.CalculateDuration(lastEnergyLog);
-                       }
+                       if ( previousLog != null) energyLog.CalculateDuration(previousLog);
                        this.SensorEnergyLogs.Add(energyLog);
+                       previousLog = energyLog;
                    }
                    this.SensorLogBatchs.Remove(sensorLogBatch);
                    this.SaveChanges();
