@@ -65,8 +65,14 @@ namespace Backend.Controllers
         public async Task<IActionResult> PostSensorLogBatch(SensorLogBatchDto sensorLogBatch)
         {
             var sensor = await this._dbContext.GetSensor(sensorLogBatch.SensorId);
-            await this._dbContext.CreateSensorLogBatch(sensor, sensorLogBatch.Content);
-            return Ok();
+            if (sensor == null) return NotFound();
+            var secretApiTokenValid = sensor.SecretApiToken.ToString();
+            if (sensorLogBatch.SecretApiToken.Equals(secretApiTokenValid))
+            {
+                await this._dbContext.CreateSensorLogBatch(sensor, sensorLogBatch.Content);
+                return new ObjectResult(null) { StatusCode = 201 };
+            }
+            return NotFound();
         }
     }
 
