@@ -178,14 +178,18 @@ namespace BackendTest
             Assert.Equal(sensor.DefaultToConvert * 3, recentEneryLogs[0].Watts3);
             Assert.Equal(sensor.DefaultToConvert * (1 + 2 + 3), recentEneryLogs[0].WattsTotal);
         }
+
         [Fact]
         public void CalculateDurationSensorLogBatchEnergyLog()
         {
             //Given
             var log_at_15_20_00 = "1574608800;1;2;3";
             var log_end_line = "|";
-            var log_at_15_35_00 = "1574608815;2;3;4";
-            var (sensor, sensorLogBatchshUnprocessed) = this.CreateSensorLogBatchEnergyLog($"{log_at_15_20_00}{log_end_line}{log_at_15_35_00}");
+            var log_at_15_20_15 = "1574608815;2;3;4";
+            var (sensor, sensorLogBatchshUnprocessed) = this.CreateSensorLogBatchEnergyLog
+            (
+                $"{log_at_15_20_00}{log_end_line}{log_at_15_20_15}"
+            );
             //When
             this.DbContext.PerformContentSensorLogBatch(sensor);
             var recentEneryLogs = this.DbContext.GetSensorEnergyLogsRecent(sensor);
@@ -198,5 +202,26 @@ namespace BackendTest
             Assert.Equal((1 + 2 + 3) * sensor.DefaultToConvert, recentEneryLogs[1].WattsTotal);
         }
 
+        [Fact]
+        public void UpdateSensorEnergyLogDurationMode()
+        {
+            //Given
+            var log_at_15_20_00 = "1574608800;1;2;3";
+            var log_end_line = "|";
+            var log_at_15_20_15 = "1574608815;2;3;4";
+            var log_at_15_20_30 = "1574608830;2;3;4";
+            var (sensor, sensorLogBatchshUnprocessed) = this.CreateSensorLogBatchEnergyLog
+            (
+                $"{log_at_15_20_00}{log_end_line}{log_at_15_20_15}{log_end_line}{log_at_15_20_30}"
+            );
+            //When
+            this.DbContext.PerformContentSensorLogBatch(sensor);
+            var recentEneryLogs = this.DbContext.GetSensorEnergyLogsRecent(sensor);
+            var sensorDto = this.DbContext.GetSensorDto(sensor.Id);
+            //Then
+            Assert.NotEmpty(recentEneryLogs);
+            Assert.Equal(3, recentEneryLogs.Length);
+            Assert.Equal(15, sensorDto.LogDurationMode);
+        }
     }
 }

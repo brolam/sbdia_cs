@@ -32,7 +32,7 @@ namespace Backend.Controllers
         public ActionResult<SensorItemDto> GetSensor(string id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var sensor = this._dbContext.GetSensor(id);
+            var sensor = this._dbContext.GetSensorItemDto(id);
             if (sensor == null)
             {
                 return NotFound();

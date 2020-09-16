@@ -28,7 +28,7 @@ namespace Backend.Models
         public float ConvertToUnits { get; set; }
         internal void CalculateDuration(SensorEnergyLog lastEnergyLog)
         {
-            this.Duration =  (this.UnixTime - lastEnergyLog.UnixTime) ;
+            this.Duration = (this.UnixTime - lastEnergyLog.UnixTime) ;
         }
         internal static SensorEnergyLog Parse(Sensor sensor, Func<long,long> GetSensorDimTimeId, string contentLogItem)
         {

@@ -50,6 +50,8 @@ namespace Backend.Data
            .OnDelete(DeleteBehavior.Restrict)
            .IsRequired();
         }
+
+        #region Sensor
         public SensorItemDto[] GetSensors(string onwerId)
         {
             var sensors = from sensor in this.Sensors
@@ -62,16 +64,7 @@ namespace Backend.Data
                           };
             return sensors.ToArray();
         }
-
-        public Sensor CreateSensor(string userId, SensorItemDto sensorItemDto)
-        {
-            var owner = this.Users.Find(userId);
-            var sensor = new Sensor() { OwnerId = owner.Id, Name = sensorItemDto.Name, SensorType = sensorItemDto.SensorType };
-            this.Add(sensor);
-            this.SaveChanges();
-            return sensor;
-        }
-        public SensorItemDto GetSensor(string id)
+        public SensorItemDto GetSensorItemDto(string id)
         {
             var sensors = from sensor in this.Sensors
             .Where(sensor => sensor.Id == id)
@@ -83,12 +76,33 @@ namespace Backend.Data
                           };
             return sensors.First();
         }
+        public SensorDto GetSensorDto(string id)
+        {
+            var sensors = from sensor in this.Sensors
+            .Where(sensor => sensor.Id == id)
+                          select new SensorDto()
+                          {
+                              LogDurationMode = sensor.LogDurationMode
+                          };
+            return sensors.First();
+        }
+        public Sensor CreateSensor(string userId, SensorItemDto sensorItemDto)
+        {
+            var owner = this.Users.Find(userId);
+            var sensor = new Sensor() { OwnerId = owner.Id, Name = sensorItemDto.Name, SensorType = sensorItemDto.SensorType };
+            this.Add(sensor);
+            this.SaveChanges();
+            return sensor;
+        }
+
+        #endregion Sensor
+
+        #region SensorCost
         public SensorCost GetSensorCost(string sensorId, long id)
         {
             return this.SensorCosts.First(sensorCost => sensorCost.SensorId == sensorId && sensorCost.Id == id);
 
         }
-
         public SensorCost GetLastOrCreateSensorCost(string sensorId)
         {
             var lastSensorCost = this.SensorCosts
@@ -102,6 +116,9 @@ namespace Backend.Data
             }
             return lastSensorCost;
         }
+        #endregion SensorCost
+
+        #region SensorDimTime
         public SensorDimTime GetSensorDimTime(string SensorId, long id)
         {
             return this.SensorDimTimes
@@ -116,7 +133,9 @@ namespace Backend.Data
             this.SaveChanges();
             return sensorDimTime;
         }
+        #endregion SensorDimTime
 
+        #region SensorLogBatch
         public object CreateSensorLogBatch(Sensor sensor, string content)
         {
             var sensorLogBatch = new SensorLogBatch()
@@ -130,7 +149,6 @@ namespace Backend.Data
             this.SaveChanges();
             return sensorLogBatch;
         }
-
         public SensorLogBatch[] GetSensorLogBatchPending(Sensor sensor)
         {
             var sensorLogBatchPending = this.SensorLogBatchs
@@ -138,10 +156,13 @@ namespace Backend.Data
             .OrderBy(sensorLogBatch => sensorLogBatch.Id);
             return sensorLogBatchPending.ToArray();
         }
+        #endregion SensorLogBatch
 
+        #region SensorEnergyLog
         public SensorEnergyLog CreateSensorEnergyLog(string sensorId, long sensorDimTimeId, long unixTime, float duration, float watts1, float watts2, float watts3, float convertToUnits)
         {
-            var createSensorEnergyLog = new SensorEnergyLog(){
+            var createSensorEnergyLog = new SensorEnergyLog()
+            {
                 SensorId = sensorId,
                 SensorDimTimeId = sensorDimTimeId,
                 UnixTime = unixTime,
@@ -156,42 +177,59 @@ namespace Backend.Data
             this.SaveChanges();
             return createSensorEnergyLog;
         }
-
-        public void PerformContentSensorLogBatch(Sensor sensor)
-        {
-           if (sensor.SensorType == SensorTypes.EnergyLog)
-           {
-               var  sensorLogBatchPending = this.GetSensorLogBatchPending(sensor);
-               foreach (var sensorLogBatch in sensorLogBatchPending)
-               {
-                   SensorEnergyLog previousLog = null;
-                   foreach( var contentLogItem in sensorLogBatch.Content.Split("|"))
-                   {
-                       var energyLog = SensorEnergyLog.Parse(sensor, ((unixTime) => this.GetOrCreateSensorDimTime(unixTime, sensor).Id) , contentLogItem);
-                       if ( previousLog != null) energyLog.CalculateDuration(previousLog);
-                       this.SensorEnergyLogs.Add(energyLog);
-                       previousLog = energyLog;
-                   }
-                   this.SensorLogBatchs.Remove(sensorLogBatch);
-                   this.SaveChanges();
-               }
-           }
-        }
-
         public SensorEnergyLogItemDto[] GetSensorEnergyLogsRecent(Sensor sensor)
         {
-            var logs = from log in this.SensorEnergyLogs 
+            var logs = from log in this.SensorEnergyLogs
             .Where(log => log.SensorId == sensor.Id)
-            select new SensorEnergyLogItemDto()
-                          {
-                              Id = log.Id,
-                              Duration = log.Duration,
-                              Watts1 = log.Watts1,
-                              Watts2 = log.Watts2,
-                              Watts3 = log.Watts3,
-                              WattsTotal = log.WattsTotal,
-                          };
+                       select new SensorEnergyLogItemDto()
+                       {
+                           Id = log.Id,
+                           Duration = log.Duration,
+                           Watts1 = log.Watts1,
+                           Watts2 = log.Watts2,
+                           Watts3 = log.Watts3,
+                           WattsTotal = log.WattsTotal,
+                       };
             return logs.OrderByDescending(log => log.Id).Take(10).ToArray<SensorEnergyLogItemDto>();
+        }
+        #endregion SensorEnergyLog
+
+        #region Business Processes 
+        public void PerformContentSensorLogBatch(Sensor sensor)
+        {
+            if (sensor.SensorType == SensorTypes.EnergyLog)
+            {
+                var sensorLogBatchPending = this.GetSensorLogBatchPending(sensor);
+                foreach (var sensorLogBatch in sensorLogBatchPending)
+                {
+                    SensorEnergyLog previousLog = null;
+                    foreach (var contentLogItem in sensorLogBatch.Content.Split("|"))
+                    {
+                        var energyLog = SensorEnergyLog.Parse(sensor, ((unixTime) => this.GetOrCreateSensorDimTime(unixTime, sensor).Id), contentLogItem);
+                        if (previousLog != null) energyLog.CalculateDuration(previousLog);
+                        this.SensorEnergyLogs.Add(energyLog);
+                        previousLog = energyLog;
+                    }
+                    this.SensorLogBatchs.Remove(sensorLogBatch);
+                    this.SaveChanges();
+                    this.UpdateSensorEnergyLogDurationMode(sensor);
+                }
+            }
+        }
+        private void UpdateSensorEnergyLogDurationMode(Sensor sensor)
+        {
+            var mode = this.SensorEnergyLogs
+            .Where(log => log.SensorId == sensor.Id)
+            .Take(100)
+            .GroupBy(log => log.Duration)
+            .OrderByDescending(g => g.Count())
+            .Select(g => g.Key).FirstOrDefault();
+            if (mode > 0)
+            {
+                sensor.LogDurationMode = mode;
+                this.SaveChanges();
+            }
         }
     }
 }
+#endregion Business Processes
