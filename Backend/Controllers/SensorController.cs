@@ -1,6 +1,7 @@
 ﻿
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Backend.Data;
 using Backend.Models;
 using Backend.Models.Dtos;
@@ -57,6 +58,15 @@ namespace Backend.Controllers
                 Name = sensor.Name,
                 SensorType = sensor.SensorType
             };
+        }
+
+        [HttpPost("logBatch")]
+        [AllowAnonymous]
+        public async Task<IActionResult> PostSensorLogBatch(SensorLogBatchDto sensorLogBatch)
+        {
+            var sensor = await this._dbContext.GetSensor(sensorLogBatch.SensorId);
+            await this._dbContext.CreateSensorLogBatch(sensor, sensorLogBatch.Content);
+            return Ok();
         }
     }
 

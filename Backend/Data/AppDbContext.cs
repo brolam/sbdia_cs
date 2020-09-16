@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Backend.Models;
 using Backend.Models.Dtos;
 using IdentityServer4.EntityFramework.Options;
@@ -52,6 +53,10 @@ namespace Backend.Data
         }
 
         #region Sensor
+        internal async Task<Sensor> GetSensor(string sensorId)
+        {
+            return await this.Sensors.FindAsync(sensorId);
+        }
         public SensorItemDto[] GetSensors(string onwerId)
         {
             var sensors = from sensor in this.Sensors
@@ -64,6 +69,7 @@ namespace Backend.Data
                           };
             return sensors.ToArray();
         }
+
         public SensorItemDto GetSensorItemDto(string id)
         {
             var sensors = from sensor in this.Sensors
@@ -82,7 +88,9 @@ namespace Backend.Data
             .Where(sensor => sensor.Id == id)
                           select new SensorDto()
                           {
-                              LogDurationMode = sensor.LogDurationMode
+                              Id = sensor.Id,
+                              LogDurationMode = sensor.LogDurationMode,
+                              SecretApiToken = sensor.SecretApiToken.ToString()
                           };
             return sensors.First();
         }
@@ -136,7 +144,7 @@ namespace Backend.Data
         #endregion SensorDimTime
 
         #region SensorLogBatch
-        public object CreateSensorLogBatch(Sensor sensor, string content)
+        public async Task<int> CreateSensorLogBatch(Sensor sensor, string content)
         {
             var sensorLogBatch = new SensorLogBatch()
             {
@@ -146,13 +154,12 @@ namespace Backend.Data
                 Attempts = 0
             };
             this.SensorLogBatchs.Add(sensorLogBatch);
-            this.SaveChanges();
-            return sensorLogBatch;
+            return await this.SaveChangesAsync();
         }
-        public SensorLogBatch[] GetSensorLogBatchPending(Sensor sensor)
+        public SensorLogBatch[] GetSensorLogBatchPending(string sensorId)
         {
             var sensorLogBatchPending = this.SensorLogBatchs
-            .Where(sensorLogBatch => sensorLogBatch.SensorId.Equals(sensor.Id) && sensorLogBatch.Attempts < 3)
+            .Where(sensorLogBatch => sensorLogBatch.SensorId.Equals(sensorId) && sensorLogBatch.Attempts < 3)
             .OrderBy(sensorLogBatch => sensorLogBatch.Id);
             return sensorLogBatchPending.ToArray();
         }
@@ -199,7 +206,7 @@ namespace Backend.Data
         {
             if (sensor.SensorType == SensorTypes.EnergyLog)
             {
-                var sensorLogBatchPending = this.GetSensorLogBatchPending(sensor);
+                var sensorLogBatchPending = this.GetSensorLogBatchPending(sensor.Id);
                 foreach (var sensorLogBatch in sensorLogBatchPending)
                 {
                     SensorEnergyLog previousLog = null;

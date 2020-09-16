@@ -125,7 +125,7 @@ namespace BackendTest
             var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
             //When
             var sensorLogBatch = this.DbContext.CreateSensorLogBatch(sensor, content);
-            var sensorLogBatchshUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor);
+            var sensorLogBatchshUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
             //Then
             Assert.NotEmpty(sensorLogBatchshUnprocessed);
             Assert.Equal(content, sensorLogBatchshUnprocessed[0].Content);
@@ -166,7 +166,7 @@ namespace BackendTest
             //When
             Assert.NotEmpty(sensorLogBatchshUnprocessed);
             this.DbContext.PerformContentSensorLogBatch(sensor);
-            sensorLogBatchshUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor);
+            sensorLogBatchshUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
             var recentEneryLogs = this.DbContext.GetSensorEnergyLogsRecent(sensor);
             //Then
             Assert.Empty(sensorLogBatchshUnprocessed);
