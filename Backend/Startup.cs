@@ -8,6 +8,7 @@ using Backend.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Backend.BackgroundServices;
 
 namespace Backend
 {
@@ -45,6 +46,8 @@ namespace Backend
             {
                 configuration.RootPath = "ClientApp/build";
             });
+            
+            services.AddHostedService<SensorLogBatchBackgroundService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
