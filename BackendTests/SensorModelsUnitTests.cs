@@ -223,5 +223,28 @@ namespace BackendTest
             Assert.Equal(3, recentEneryLogs.Length);
             Assert.Equal(15, sensorDto.LogDurationMode);
         }
+
+        [Fact]
+        public async void GetSensorWithLogBatchPending()
+        {
+            //Given
+            var (sensor, sensorLogBatchs) = CreateSensorLogBatchEnergyLog("1574608324;1;2;3");
+            var sensorWithLogBatchPending = await this.DbContext.GetSensorWithLogBatchPending();
+            //Then
+            Assert.NotEmpty(sensorWithLogBatchPending);
+            Assert.Equal(sensor.Id, sensorWithLogBatchPending[0].Id);
+        }
+
+        [Fact]
+        public async void GetSensorWithoutLogBatchPending()
+        {
+            //Given
+            var (sensor, sensorLogBatchs) = CreateSensorLogBatchEnergyLog("1574608324;1;2;3");
+            //When
+            this.DbContext.PerformContentSensorLogBatch(sensor);
+            var sensorWithoutLogBatchPending = await this.DbContext.GetSensorWithLogBatchPending();
+            //Then
+            Assert.Empty(sensorWithoutLogBatchPending);
+        }
     }
 }

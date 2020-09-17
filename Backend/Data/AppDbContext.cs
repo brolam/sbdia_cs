@@ -237,6 +237,17 @@ namespace Backend.Data
                 this.SaveChanges();
             }
         }
+        public async Task<Sensor[]> GetSensorWithLogBatchPending()
+        {
+            return await this.Sensors
+            .Where
+            (
+                sensor => this.SensorLogBatchs.Any
+                (
+                    logBatch => ((logBatch.SensorId == sensor.Id) && (logBatch.Attempts < 3))
+                )
+            ).ToArrayAsync();
+        }
     }
 }
 #endregion Business Processes
