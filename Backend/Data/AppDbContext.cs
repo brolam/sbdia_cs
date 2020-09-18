@@ -159,7 +159,7 @@ namespace Backend.Data
         public SensorLogBatch[] GetSensorLogBatchPending(string sensorId)
         {
             var sensorLogBatchPending = this.SensorLogBatchs
-            .Where(sensorLogBatch => sensorLogBatch.SensorId.Equals(sensorId) && sensorLogBatch.Attempts < 3)
+            .Where(sensorLogBatch => sensorLogBatch.SensorId.Equals(sensorId) && sensorLogBatch.Attempts <= 3)
             .OrderBy(sensorLogBatch => sensorLogBatch.Id);
             return sensorLogBatchPending.ToArray();
         }
@@ -210,17 +210,27 @@ namespace Backend.Data
                 foreach (var sensorLogBatch in sensorLogBatchPending)
                 {
                     SensorEnergyLog previousLog = null;
-                    foreach (var contentLogItem in sensorLogBatch.Content.Split("|"))
+                    try
                     {
-                        var energyLog = SensorEnergyLog.Parse(sensor, ((unixTime) => this.GetOrCreateSensorDimTime(unixTime, sensor).Id), contentLogItem);
-                        if (previousLog != null) energyLog.CalculateDuration(previousLog);
-                        this.SensorEnergyLogs.Add(energyLog);
-                        previousLog = energyLog;
+                        foreach (var contentLogItem in sensorLogBatch.Content.Split("|"))
+                        {
+                            var energyLog = SensorEnergyLog.Parse(sensor, ((unixTime) => this.GetOrCreateSensorDimTime(unixTime, sensor).Id), contentLogItem);
+                            if (previousLog != null) energyLog.CalculateDuration(previousLog);
+                            this.SensorEnergyLogs.Add(energyLog);
+                            previousLog = energyLog;
+                            this.SaveChanges();
+                        }
+                        this.SensorLogBatchs.Remove(sensorLogBatch);
+                        this.SaveChanges();
                     }
-                    this.SensorLogBatchs.Remove(sensorLogBatch);
-                    this.SaveChanges();
-                    this.UpdateSensorEnergyLogDurationMode(sensor);
+                    catch (Exception e)
+                    {
+                        sensorLogBatch.Attempts++;
+                        sensorLogBatch.Exception = $"Message: {e.Message}\nSource: {e.Source}";
+                        this.SaveChanges();
+                    }
                 }
+                this.UpdateSensorEnergyLogDurationMode(sensor);
             }
         }
         private void UpdateSensorEnergyLogDurationMode(Sensor sensor)

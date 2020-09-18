@@ -13,7 +13,7 @@ namespace Backend.Models
         [Required]
         public string Content { get; set; }
         [Required]
-        public int Attempts { get; set; } = 1;
+        public int Attempts { get; set; } = 0;
         public string Exception { get; set; }
     }
 }

@@ -125,12 +125,12 @@ namespace BackendTest
             var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
             //When
             var sensorLogBatch = this.DbContext.CreateSensorLogBatch(sensor, content);
-            var sensorLogBatchshUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
+            var sensorLogBatchsUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
             //Then
-            Assert.NotEmpty(sensorLogBatchshUnprocessed);
-            Assert.Equal(content, sensorLogBatchshUnprocessed[0].Content);
-            Assert.Equal(0, sensorLogBatchshUnprocessed[0].Attempts);
-            return (sensor, sensorLogBatchshUnprocessed);
+            Assert.NotEmpty(sensorLogBatchsUnprocessed);
+            Assert.Equal(content, sensorLogBatchsUnprocessed[0].Content);
+            Assert.Equal(0, sensorLogBatchsUnprocessed[0].Attempts);
+            return (sensor, sensorLogBatchsUnprocessed);
         }
 
         [Fact]
@@ -162,14 +162,14 @@ namespace BackendTest
         public void PerformContentSensorLogBatchEnergyLog()
         {
             //Given
-            var (sensor, sensorLogBatchshUnprocessed) = this.CreateSensorLogBatchEnergyLog("1574608324;1;2;3");
+            var (sensor, sensorLogBatchsUnprocessed) = this.CreateSensorLogBatchEnergyLog("1574608324;1;2;3");
             //When
-            Assert.NotEmpty(sensorLogBatchshUnprocessed);
+            Assert.NotEmpty(sensorLogBatchsUnprocessed);
             this.DbContext.PerformContentSensorLogBatch(sensor);
-            sensorLogBatchshUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
+            sensorLogBatchsUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
             var recentEneryLogs = this.DbContext.GetSensorEnergyLogsRecent(sensor);
             //Then
-            Assert.Empty(sensorLogBatchshUnprocessed);
+            Assert.Empty(sensorLogBatchsUnprocessed);
             Assert.NotEmpty(recentEneryLogs);
             Assert.Equal(1, recentEneryLogs[0].Id);
             Assert.Equal(sensor.LogDurationMode, recentEneryLogs[0].Duration);
@@ -180,13 +180,34 @@ namespace BackendTest
         }
 
         [Fact]
+        public void PerformContentSensorLogBatchEnergyLogSetAttempts()
+        {
+            //Given
+            var (sensor, sensorLogBatchsWithError) = this.CreateSensorLogBatchEnergyLog("1574608324;1;2");
+            
+            //When
+            Assert.NotEmpty(sensorLogBatchsWithError);
+            var attempts = 2;
+            for (int attempt = 1; attempt <= attempts; attempt++)
+            {
+                this.DbContext.PerformContentSensorLogBatch(sensor);
+            }  
+            var sensorLogBatchsUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
+            
+            //Then
+            Assert.NotEmpty(sensorLogBatchsUnprocessed);
+            Assert.Equal(attempts, sensorLogBatchsUnprocessed[0].Attempts);
+            Assert.NotEmpty(sensorLogBatchsUnprocessed[0].Exception);
+        }
+
+        [Fact]
         public void CalculateDurationSensorLogBatchEnergyLog()
         {
             //Given
             var log_at_15_20_00 = "1574608800;1;2;3";
             var log_end_line = "|";
             var log_at_15_20_15 = "1574608815;2;3;4";
-            var (sensor, sensorLogBatchshUnprocessed) = this.CreateSensorLogBatchEnergyLog
+            var (sensor, sensorLogBatchsUnprocessed) = this.CreateSensorLogBatchEnergyLog
             (
                 $"{log_at_15_20_00}{log_end_line}{log_at_15_20_15}"
             );
@@ -210,7 +231,7 @@ namespace BackendTest
             var log_end_line = "|";
             var log_at_15_20_15 = "1574608815;2;3;4";
             var log_at_15_20_30 = "1574608830;2;3;4";
-            var (sensor, sensorLogBatchshUnprocessed) = this.CreateSensorLogBatchEnergyLog
+            var (sensor, sensorLogBatchsUnprocessed) = this.CreateSensorLogBatchEnergyLog
             (
                 $"{log_at_15_20_00}{log_end_line}{log_at_15_20_15}{log_end_line}{log_at_15_20_30}"
             );
