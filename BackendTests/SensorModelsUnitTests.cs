@@ -201,6 +201,25 @@ namespace BackendTest
         }
 
         [Fact]
+        public void PerformContentSensorLogBatchEnergyLogSetMaxAttempts()
+        {
+            //Given
+            var (sensor, sensorLogBatchsWithError) = this.CreateSensorLogBatchEnergyLog("1574608324;1;2");
+            
+            //When
+            Assert.NotEmpty(sensorLogBatchsWithError);
+            var attempts = 4;
+            for (int attempt = 1; attempt <= attempts; attempt++)
+            {
+                this.DbContext.PerformContentSensorLogBatch(sensor);
+            }  
+            var sensorLogBatchsUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
+            
+            //Then
+            Assert.Empty(sensorLogBatchsUnprocessed);
+        }
+
+        [Fact]
         public void CalculateDurationSensorLogBatchEnergyLog()
         {
             //Given
