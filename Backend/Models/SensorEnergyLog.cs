@@ -28,9 +28,10 @@ namespace Backend.Models
         public float ConvertToUnits { get; set; }
         internal void CalculateDuration(SensorEnergyLog lastEnergyLog)
         {
-            this.Duration = (this.UnixTime - lastEnergyLog.UnixTime) ;
+            this.Duration = (this.UnixTime - lastEnergyLog.UnixTime);
         }
-        internal static SensorEnergyLog Parse(Sensor sensor, Func<long,long> GetSensorDimTimeId, string contentLogItem)
+        
+        internal static SensorEnergyLog Parse(Sensor sensor, Func<long, long> GetSensorDimTimeId, string contentLogItem)
         {
             var contenValues = contentLogItem.Split(";");
             var unixTime = long.Parse(contenValues[0]);
@@ -51,6 +52,14 @@ namespace Backend.Models
                 ConvertToUnits = sensor.DefaultToConvert
             };
             return sensorEnergyLog;
+        }
+
+        internal void Update(SensorEnergyLog newEnergyLog)
+        {
+            this.Watts1 = newEnergyLog.Watts1;
+            this.Watts2 = newEnergyLog.Watts2;
+            this.Watts3 = newEnergyLog.Watts3;
+            this.WattsTotal = newEnergyLog.WattsTotal;
         }
     }
 }

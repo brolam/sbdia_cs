@@ -24,6 +24,6 @@ namespace Backend.Models
         [Required] 
         public float LogDurationMode { get; set; } = 14.00f;
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid SecretApiToken { get; set; } = Guid.NewGuid();
+        public string SecretApiToken { get; set; } = Guid.NewGuid().ToString();
     }
 }

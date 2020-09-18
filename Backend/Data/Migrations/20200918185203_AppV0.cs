@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Backend.Data.Migrations
 {
-    public partial class CreateSensor : Migration
+    public partial class AppV0 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -109,7 +109,7 @@ namespace Backend.Data.Migrations
                     Id = table.Column<long>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     SensorId = table.Column<string>(nullable: false),
-                    SecretApiToken = table.Column<Guid>(nullable: false),
+                    SecretApiToken = table.Column<string>(nullable: false),
                     Content = table.Column<string>(nullable: false),
                     Attempts = table.Column<int>(nullable: false),
                     Exception = table.Column<string>(nullable: true)
@@ -236,7 +236,7 @@ namespace Backend.Data.Migrations
                     TimeZone = table.Column<string>(maxLength: 200, nullable: false),
                     DefaultToConvert = table.Column<float>(nullable: false),
                     LogDurationMode = table.Column<float>(nullable: false),
-                    SecretApiToken = table.Column<Guid>(nullable: false)
+                    SecretApiToken = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -375,6 +375,12 @@ namespace Backend.Data.Migrations
                 name: "IX_SensorDimTimes_SensorId",
                 table: "SensorDimTimes",
                 column: "SensorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SensorEnergyLogs_SensorId_UnixTime",
+                table: "SensorEnergyLogs",
+                columns: new[] { "SensorId", "UnixTime" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sensors_OwnerId",

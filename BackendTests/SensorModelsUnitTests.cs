@@ -184,16 +184,16 @@ namespace BackendTest
         {
             //Given
             var (sensor, sensorLogBatchsWithError) = this.CreateSensorLogBatchEnergyLog("1574608324;1;2");
-            
+
             //When
             Assert.NotEmpty(sensorLogBatchsWithError);
             var attempts = 2;
             for (int attempt = 1; attempt <= attempts; attempt++)
             {
                 this.DbContext.PerformContentSensorLogBatch(sensor);
-            }  
+            }
             var sensorLogBatchsUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
-            
+
             //Then
             Assert.NotEmpty(sensorLogBatchsUnprocessed);
             Assert.Equal(attempts, sensorLogBatchsUnprocessed[0].Attempts);
@@ -205,18 +205,41 @@ namespace BackendTest
         {
             //Given
             var (sensor, sensorLogBatchsWithError) = this.CreateSensorLogBatchEnergyLog("1574608324;1;2");
-            
+
             //When
             Assert.NotEmpty(sensorLogBatchsWithError);
             var attempts = 4;
             for (int attempt = 1; attempt <= attempts; attempt++)
             {
                 this.DbContext.PerformContentSensorLogBatch(sensor);
-            }  
+            }
             var sensorLogBatchsUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
-            
+
             //Then
             Assert.Empty(sensorLogBatchsUnprocessed);
+        }
+
+        [Fact]
+        public async void PerformContentSensorLogBatchEnergyLogUpdateIfExists()
+        {
+            //Given
+            var (sensor, sensorLogBatchsWithError) = this.CreateSensorLogBatchEnergyLog("1574608324;1;2;3");
+
+            //When
+            await this.DbContext.CreateSensorLogBatch(sensor, "1574608324;4;5;6");
+            var sensorLogBatchsUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
+            Assert.Equal(2, sensorLogBatchsUnprocessed.Length);
+            this.DbContext.PerformContentSensorLogBatch(sensor);
+            var recentEneryLogs = this.DbContext.GetSensorEnergyLogsRecent(sensor);
+
+            //Then
+            Assert.NotEmpty(recentEneryLogs);
+            Assert.Equal(1, (int)recentEneryLogs.Length);
+            Assert.Equal(sensor.DefaultToConvert * 4, recentEneryLogs[0].Watts1);
+            Assert.Equal(sensor.DefaultToConvert * 5, recentEneryLogs[0].Watts2);
+            Assert.Equal(sensor.DefaultToConvert * 6, recentEneryLogs[0].Watts3);
+            Assert.Equal(sensor.DefaultToConvert * (4 + 5 + 6), recentEneryLogs[0].WattsTotal);
+            
         }
 
         [Fact]

@@ -9,7 +9,7 @@ namespace Backend.Models
         [Required]
         public string SensorId { get; set; }
         [Required]
-        public Guid SecretApiToken { get; set; }
+        public string SecretApiToken { get; set; }
         [Required]
         public string Content { get; set; }
         [Required]

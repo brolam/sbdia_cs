@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200907190405_CreateSensor")]
-    partial class CreateSensor
+    [Migration("20200918185203_AppV0")]
+    partial class AppV0
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -104,9 +104,10 @@ namespace Backend.Data.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
 
-                    b.Property<Guid>("SecretApiToken")
+                    b.Property<string>("SecretApiToken")
+                        .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<int>("SensorType")
                         .HasColumnType("int");
@@ -208,7 +209,7 @@ namespace Backend.Data.Migrations
 
                     b.Property<string>("SensorId")
                         .IsRequired()
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
 
                     b.Property<long>("UnixTime")
                         .HasColumnType("bigint");
@@ -226,6 +227,9 @@ namespace Backend.Data.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SensorId", "UnixTime")
+                        .IsUnique();
 
                     b.ToTable("SensorEnergyLogs");
                 });
@@ -246,8 +250,9 @@ namespace Backend.Data.Migrations
                     b.Property<string>("Exception")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
-                    b.Property<Guid>("SecretApiToken")
-                        .HasColumnType("char(36)");
+                    b.Property<string>("SecretApiToken")
+                        .IsRequired()
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<string>("SensorId")
                         .IsRequired()

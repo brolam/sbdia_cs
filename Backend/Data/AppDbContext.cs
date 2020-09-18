@@ -50,6 +50,10 @@ namespace Backend.Data
            .HasForeignKey(sensorDimTime => sensorDimTime.SensorCostId)
            .OnDelete(DeleteBehavior.Restrict)
            .IsRequired();
+
+            modelBuilder.Entity<SensorEnergyLog>()
+            .HasIndex(log => new { log.SensorId, log.UnixTime })
+            .IsUnique(true);
         }
 
         #region Sensor
@@ -209,30 +213,65 @@ namespace Backend.Data
                 var sensorLogBatchPending = this.GetSensorLogBatchPending(sensor.Id);
                 foreach (var sensorLogBatch in sensorLogBatchPending)
                 {
-                    SensorEnergyLog previousLog = null;
-                    try
+                    if (sensor.SensorType == SensorTypes.EnergyLog)
                     {
-                        foreach (var contentLogItem in sensorLogBatch.Content.Split("|"))
-                        {
-                            var energyLog = SensorEnergyLog.Parse(sensor, ((unixTime) => this.GetOrCreateSensorDimTime(unixTime, sensor).Id), contentLogItem);
-                            if (previousLog != null) energyLog.CalculateDuration(previousLog);
-                            this.SensorEnergyLogs.Add(energyLog);
-                            previousLog = energyLog;
-                            this.SaveChanges();
-                        }
-                        this.SensorLogBatchs.Remove(sensorLogBatch);
-                        this.SaveChanges();
-                    }
-                    catch (Exception e)
-                    {
-                        sensorLogBatch.Attempts++;
-                        sensorLogBatch.Exception = $"Message: {e.Message}\nSource: {e.Source}";
-                        this.SaveChanges();
+                        PerformSensorEnergyLogBatch(sensor, sensorLogBatch);
                     }
                 }
                 this.UpdateSensorEnergyLogDurationMode(sensor);
             }
         }
+
+        private void PerformSensorEnergyLogBatch(Sensor sensor, SensorLogBatch sensorLogBatch)
+        {
+            SensorEnergyLog previousLog = null;
+            try
+            {
+                foreach (var contentLogItem in sensorLogBatch.Content.Split("|"))
+                {
+                    Func<long, long> getSensorDimTimeId = (unixTime) => this.GetOrCreateSensorDimTime(unixTime, sensor).Id;
+                    var newEnergyLog = SensorEnergyLog.Parse(sensor, getSensorDimTimeId , contentLogItem);
+                    if (previousLog != null) newEnergyLog.CalculateDuration(previousLog);
+                    this.SensorEnergyLogs.Add(newEnergyLog);
+                    this.SaveOrUpdateSensorEnergyLog(newEnergyLog);
+                    previousLog = newEnergyLog;
+                }
+                this.SensorLogBatchs.Remove(sensorLogBatch);
+                this.SaveChanges();
+
+            }
+            catch (Exception e)
+            {
+                sensorLogBatch.Attempts++;
+                sensorLogBatch.Exception = $"Message: {e.Message}\nSource: {e.Source}";
+                this.SaveChanges();
+            }
+        }
+
+        private void SaveOrUpdateSensorEnergyLog(SensorEnergyLog newEnergyLog)
+        {
+            try
+            {
+                this.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                this.SensorEnergyLogs.Remove(newEnergyLog);
+                var oldEnergyLog = this.SensorEnergyLogs
+               .Where(log => (log.SensorId == newEnergyLog.SensorId) && (log.UnixTime == newEnergyLog.UnixTime))
+               .FirstOrDefault();
+                if (oldEnergyLog != null)
+                {
+                    oldEnergyLog.Update(newEnergyLog);
+                    this.SaveChanges();
+                }
+                else
+                {
+                    throw e;
+                }
+            }
+        }
+        
         private void UpdateSensorEnergyLogDurationMode(Sensor sensor)
         {
             var mode = this.SensorEnergyLogs
