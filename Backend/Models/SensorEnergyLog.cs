@@ -35,9 +35,9 @@ namespace Backend.Models
         {
             var contenValues = contentLogItem.Split(";");
             var unixTime = long.Parse(contenValues[0]);
-            var watts1 = long.Parse(contenValues[1]);
-            var watts2 = long.Parse(contenValues[2]);
-            var watts3 = long.Parse(contenValues[3]);
+            var watts1 = float.Parse(contenValues[1]);
+            var watts2 = float.Parse(contenValues[2]);
+            var watts3 = float.Parse(contenValues[3]);
             var wattsTotal = watts1 + watts2 + watts3;
             var sensorEnergyLog = new SensorEnergyLog()
             {
