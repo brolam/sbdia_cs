@@ -12,5 +12,8 @@ namespace Backend.Models.Dtos
         public SensorTypes SensorType { get; set; }
         [Required, MaxLength(50)]
         public string Name { get; set; }
+        public string SensorTypeName { get; set; }
+        public float LogDurationMode { get; set; }
+        public DateTime LogLastRecorded { get; set; }
     }
 }

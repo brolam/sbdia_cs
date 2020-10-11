@@ -23,10 +23,10 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<SensorItemDto>> GetSensorAll()
+        public async Task<ActionResult<IEnumerable<SensorItemDto>>> GetSensorAll()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return this._dbContext.GetSensors(userId);
+            return await this._dbContext.GetSensors(userId);
         }
 
         [HttpGet("{id}")]

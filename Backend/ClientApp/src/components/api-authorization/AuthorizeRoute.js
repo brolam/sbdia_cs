@@ -10,7 +10,8 @@ export default class AuthorizeRoute extends Component {
 
         this.state = {
             ready: false,
-            authenticated: false
+            authenticated: false,
+            token:""
         };
     }
 
@@ -24,7 +25,7 @@ export default class AuthorizeRoute extends Component {
     }
 
     render() {
-        const { ready, authenticated } = this.state;
+        const { ready, authenticated, token } = this.state;
         const redirectUrl = `${ApplicationPaths.Login}?${QueryParameterNames.ReturnUrl}=${encodeURI(window.location.href)}`
         if (!ready) {
             return <div></div>;
@@ -32,6 +33,7 @@ export default class AuthorizeRoute extends Component {
             const { component: ComponentAuthenticated, ...rest } = this.props;
             return <Route {...rest}
                 render={(props) => {
+                    props.token = token;
                     if (authenticated) {
                         return <ComponentAuthenticated {...props} />
                     } else {
@@ -43,11 +45,12 @@ export default class AuthorizeRoute extends Component {
 
     async populateAuthenticationState() {
         const authenticated = await authService.isAuthenticated();
-        this.setState({ ready: true, authenticated });
+        const token = authenticated?  await authService.getAccessToken() : "";
+        this.setState({ ready: true, authenticated, token:token });
     }
 
     async authenticationChanged() {
-        this.setState({ ready: false, authenticated: false });
+        this.setState({ ready: false, authenticated: false, token:"" });
         await this.populateAuthenticationState();
     }
 }

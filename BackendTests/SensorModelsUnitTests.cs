@@ -3,6 +3,7 @@ using Backend.Models;
 using Backend.Models.Dtos;
 using System;
 using BackendTests.Mocks;
+using System.Threading.Tasks;
 
 namespace BackendTest
 {
@@ -23,16 +24,21 @@ namespace BackendTest
         }
 
         [Theory, InlineData("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog)]
-        public Sensor CreateSensor(string userEmail, string sensorName, SensorTypes sensorType)
+        public async Task<Sensor> CreateSensorAsync(string userEmail, string sensorName, SensorTypes sensorType)
         {
             //Given
             var user = CreateUser(userEmail);
             var sensor = this.DbContext.CreateSensor(user.Id, new SensorItemDto() { Name = sensorName, SensorType = sensorType });
             //When
-            var userSensors = this.DbContext.GetSensors(user.Id);
+            var userSensors = await this.DbContext.GetSensors(user.Id);
             //Then
             Assert.NotEmpty(userSensors);
-            Assert.Equal(userSensors[0].Id, sensor.Id.ToString());
+            Assert.Equal(sensor.Id.ToString(), userSensors[0].Id );
+            Assert.Equal("My Sensor", userSensors[0].Name);
+            Assert.Equal(SensorTypes.EnergyLog, userSensors[0].SensorType);
+            Assert.Equal("EnergyLog", userSensors[0].SensorTypeName);
+            Assert.Equal(14, userSensors[0].LogDurationMode);
+            Assert.Equal(new DateTime(2020,10,11,12,55,59), userSensors[0].LogLastRecorded);
             return sensor;
         }
 
@@ -40,16 +46,16 @@ namespace BackendTest
         public void NotCreateSensorWithoutName()
         {
             //Then
-            Assert.Throws<Microsoft.EntityFrameworkCore.DbUpdateException>(
-                () => CreateSensor("UserWithSensor@sbdia.iot", null, SensorTypes.EnergyLog)
+            Assert.ThrowsAsync<Microsoft.EntityFrameworkCore.DbUpdateException>(
+                () =>  CreateSensorAsync("UserWithSensor@sbdia.iot", null, SensorTypes.EnergyLog)
             );
         }
 
         [Theory, InlineData("$", 0.6F)]
-        public void CreateSensorCost(string title, float value)
+        public async Task CreateSensorCostAsync(string title, float value)
         {
             //Given
-            var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
+            var sensor = await CreateSensorAsync("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
             var cost = new SensorCost() { Title = title, SensorId = sensor.Id, Value = value };
             //When
             this.DbContext.Add(cost);
@@ -63,16 +69,16 @@ namespace BackendTest
         public void CreateSensorCostWithoutTitle()
         {
             //Then
-            Assert.Throws<Microsoft.EntityFrameworkCore.DbUpdateException>(
-                () => CreateSensorCost(null, 0.6F)
+            Assert.ThrowsAsync<Microsoft.EntityFrameworkCore.DbUpdateException>(
+                () => CreateSensorCostAsync(null, 0.6F)
             );
         }
 
         [Theory, InlineData(2020, 7, 17, 12)]
-        public void CreateSensorDimTime(int year, int month, int day, int hour)
+        public async Task CreateSensorDimTimeAsync(int year, int month, int day, int hour)
         {
             //Given
-            var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
+            var sensor = await CreateSensorAsync("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
             var sensorCost = this.DbContext.GetLastOrCreateSensorCost(sensor.Id);
             var dateTime = new DateTime(year, month, day, hour, 0, 0);
             var sensorDimTime = new SensorDimTime() { DateTime = dateTime, SensorId = sensor.Id, SensorCostId = sensorCost.Id };
@@ -101,10 +107,10 @@ namespace BackendTest
         }
 
         [Theory, InlineData(1595288285, 2020, 07, 20, 20, DayOfWeek.Monday, PeriodOfDayTypes.Eve)]
-        public void CreateSensorDimTimeFromUnixTime(long unixTime, int year, int month, int day, int hour, DayOfWeek dayOfWeek, PeriodOfDayTypes periodOfDayType)
+        public async Task CreateSensorDimTimeFromUnixTimeAsync(long unixTime, int year, int month, int day, int hour, DayOfWeek dayOfWeek, PeriodOfDayTypes periodOfDayType)
         {
             //Given
-            var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
+            var sensor = await CreateSensorAsync("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
             var sensorDimTime = this.DbContext.GetOrCreateSensorDimTime(unixTime, sensor);
             //When
             var savedSensorDimTime = this.DbContext.GetSensorDimTime(sensor.Id, sensorDimTime.Id);
@@ -119,10 +125,10 @@ namespace BackendTest
 
         [Theory]
         [InlineData("1574608324;1;2;3")]
-        public (Sensor, SensorLogBatch[]) CreateSensorLogBatchEnergyLog(string content)
+        public async Task<(Sensor, SensorLogBatch[])> CreateSensorLogBatchEnergyLogAsync(string content)
         {
             //Given
-            var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
+            var sensor = await CreateSensorAsync("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
             //When
             var sensorLogBatch = this.DbContext.CreateSensorLogBatch(sensor, content);
             var sensorLogBatchsUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
@@ -134,10 +140,10 @@ namespace BackendTest
         }
 
         [Fact]
-        public void CreateSensorEnergyLog()
+        public async Task CreateSensorEnergyLogAsync()
         {
             //Given
-            var sensor = CreateSensor("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
+            var sensor = await CreateSensorAsync("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
             var unixTime = 1574608324;
             var sensorDimTime = this.DbContext.GetOrCreateSensorDimTime(unixTime, sensor);
             const float Duration = 14.00F;
@@ -159,10 +165,10 @@ namespace BackendTest
         }
 
         [Fact]
-        public void PerformContentSensorLogBatchEnergyLog()
+        public async Task PerformContentSensorLogBatchEnergyLogAsync()
         {
             //Given
-            var (sensor, sensorLogBatchsUnprocessed) = this.CreateSensorLogBatchEnergyLog("1574608324;1;2;3");
+            var (sensor, sensorLogBatchsUnprocessed) = await this.CreateSensorLogBatchEnergyLogAsync("1574608324;1;2;3");
             //When
             Assert.NotEmpty(sensorLogBatchsUnprocessed);
             this.DbContext.PerformContentSensorLogBatch(sensor);
@@ -180,10 +186,10 @@ namespace BackendTest
         }
 
         [Fact]
-        public void PerformContentSensorLogBatchEnergyLogSetAttempts()
+        public async Task PerformContentSensorLogBatchEnergyLogSetAttemptsAsync()
         {
             //Given
-            var (sensor, sensorLogBatchsWithError) = this.CreateSensorLogBatchEnergyLog("1574608324;1;2");
+            var (sensor, sensorLogBatchsWithError) = await this.CreateSensorLogBatchEnergyLogAsync("1574608324;1;2");
 
             //When
             Assert.NotEmpty(sensorLogBatchsWithError);
@@ -201,10 +207,10 @@ namespace BackendTest
         }
 
         [Fact]
-        public void PerformContentSensorLogBatchEnergyLogSetMaxAttempts()
+        public async Task PerformContentSensorLogBatchEnergyLogSetMaxAttemptsAsync()
         {
             //Given
-            var (sensor, sensorLogBatchsWithError) = this.CreateSensorLogBatchEnergyLog("1574608324;1;2");
+            var (sensor, sensorLogBatchsWithError) = await this.CreateSensorLogBatchEnergyLogAsync("1574608324;1;2");
 
             //When
             Assert.NotEmpty(sensorLogBatchsWithError);
@@ -223,7 +229,7 @@ namespace BackendTest
         public async void PerformContentSensorLogBatchEnergyLogUpdateIfExists()
         {
             //Given
-            var (sensor, sensorLogBatchsWithError) = this.CreateSensorLogBatchEnergyLog("1574608324;1;2;3");
+            var (sensor, sensorLogBatchsWithError) = await this.CreateSensorLogBatchEnergyLogAsync("1574608324;1;2;3");
 
             //When
             await this.DbContext.CreateSensorLogBatch(sensor, "1574608324;4;5;6");
@@ -243,13 +249,13 @@ namespace BackendTest
         }
 
         [Fact]
-        public void CalculateDurationSensorLogBatchEnergyLog()
+        public async Task CalculateDurationSensorLogBatchEnergyLogAsync()
         {
             //Given
             var log_at_15_20_00 = "1574608800;1;2;3";
             var log_end_line = "|";
             var log_at_15_20_15 = "1574608815;2;3;4";
-            var (sensor, sensorLogBatchsUnprocessed) = this.CreateSensorLogBatchEnergyLog
+            var (sensor, sensorLogBatchsUnprocessed) = await this.CreateSensorLogBatchEnergyLogAsync
             (
                 $"{log_at_15_20_00}{log_end_line}{log_at_15_20_15}"
             );
@@ -266,14 +272,14 @@ namespace BackendTest
         }
 
         [Fact]
-        public void UpdateSensorEnergyLogDurationMode()
+        public async Task UpdateSensorEnergyLogDurationModeAsync()
         {
             //Given
             var log_at_15_20_00 = "1574608800;1;2;3";
             var log_end_line = "|";
             var log_at_15_20_15 = "1574608815;2;3;4";
             var log_at_15_20_30 = "1574608830;2;3;4";
-            var (sensor, sensorLogBatchsUnprocessed) = this.CreateSensorLogBatchEnergyLog
+            var (sensor, sensorLogBatchsUnprocessed) = await this.CreateSensorLogBatchEnergyLogAsync
             (
                 $"{log_at_15_20_00}{log_end_line}{log_at_15_20_15}{log_end_line}{log_at_15_20_30}"
             );
@@ -291,7 +297,7 @@ namespace BackendTest
         public async void GetSensorWithLogBatchPending()
         {
             //Given
-            var (sensor, sensorLogBatchs) = CreateSensorLogBatchEnergyLog("1574608324;1;2;3");
+            var (sensor, sensorLogBatchs) = await CreateSensorLogBatchEnergyLogAsync("1574608324;1;2;3");
             var sensorWithLogBatchPending = await this.DbContext.GetSensorWithLogBatchPending();
             //Then
             Assert.NotEmpty(sensorWithLogBatchPending);
@@ -302,7 +308,7 @@ namespace BackendTest
         public async void GetSensorWithoutLogBatchPending()
         {
             //Given
-            var (sensor, sensorLogBatchs) = CreateSensorLogBatchEnergyLog("1574608324;1;2;3");
+            var (sensor, sensorLogBatchs) = await CreateSensorLogBatchEnergyLogAsync("1574608324;1;2;3");
             //When
             this.DbContext.PerformContentSensorLogBatch(sensor);
             var sensorWithoutLogBatchPending = await this.DbContext.GetSensorWithLogBatchPending();

@@ -33,7 +33,7 @@ namespace BackendTest
             // Act
             var actionResult = _controller.GetSensorAll();
             // Assert
-            Assert.Null(actionResult.Result);
+            Assert.Empty(actionResult.Result.Value);
         }
 
         [Fact]

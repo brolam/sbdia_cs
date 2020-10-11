@@ -61,7 +61,7 @@ namespace Backend.Data
         {
             return await this.Sensors.FindAsync(sensorId);
         }
-        public SensorItemDto[] GetSensors(string onwerId)
+        public async Task<SensorItemDto[]> GetSensors(string onwerId)
         {
             var sensors = from sensor in this.Sensors
             .Where(sensor => sensor.OwnerId == onwerId)
@@ -69,9 +69,12 @@ namespace Backend.Data
                           {
                               Id = sensor.Id.ToString(),
                               Name = sensor.Name,
-                              SensorType = sensor.SensorType
+                              SensorType = sensor.SensorType,
+                              SensorTypeName = sensor.SensorType.ToString(),
+                              LogDurationMode = sensor.LogDurationMode,
+                              LogLastRecorded =  new DateTime(2020,10,11,12,55,59)
                           };
-            return sensors.ToArray();
+            return await sensors.ToArrayAsync();
         }
 
         public SensorItemDto GetSensorItemDto(string id)
@@ -230,7 +233,7 @@ namespace Backend.Data
                 foreach (var contentLogItem in sensorLogBatch.Content.Split("|"))
                 {
                     Func<long, long> getSensorDimTimeId = (unixTime) => this.GetOrCreateSensorDimTime(unixTime, sensor).Id;
-                    var newEnergyLog = SensorEnergyLog.Parse(sensor, getSensorDimTimeId , contentLogItem);
+                    var newEnergyLog = SensorEnergyLog.Parse(sensor, getSensorDimTimeId, contentLogItem);
                     if (previousLog != null) newEnergyLog.CalculateDuration(previousLog);
                     this.SensorEnergyLogs.Add(newEnergyLog);
                     this.SaveOrUpdateSensorEnergyLog(newEnergyLog);
@@ -271,7 +274,7 @@ namespace Backend.Data
                 }
             }
         }
-        
+
         private void UpdateSensorEnergyLogDurationMode(Sensor sensor)
         {
             var mode = this.SensorEnergyLogs
