@@ -2,27 +2,40 @@ import React, { Component } from 'react';
 import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { LoginMenu } from './api-authorization/LoginMenu';
+import SensorMenu from './Sensors/SensorMenu'
+import authService from './api-authorization/AuthorizeService';
 import './NavMenu.css';
+
 
 export class NavMenu extends Component {
   static displayName = NavMenu.name;
 
-  constructor (props) {
+  constructor(props) {
     super(props);
 
     this.toggleNavbar = this.toggleNavbar.bind(this);
     this.state = {
-      collapsed: true
+      collapsed: true,
+      isAuthenticated: false
     };
   }
 
-  toggleNavbar () {
+  componentDidMount() {
+    this.setAuthenticated()
+  }
+
+  async setAuthenticated() {
+    let isAuthenticated = await authService.isAuthenticated();
+    this.setState({ ...this.state, isAuthenticated })
+  }
+
+  toggleNavbar() {
     this.setState({
-      collapsed: !this.state.collapsed
+      ...this.state, collapsed: !this.state.collapsed
     });
   }
 
-  render () {
+  render() {
     return (
       <header>
         <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3" light>
@@ -41,7 +54,7 @@ export class NavMenu extends Component {
                   <NavLink tag={Link} className="text-dark" to="/fetch-data">Fetch data</NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/sensors">Sensors</NavLink>
+                  <SensorMenu tag={Link} isAuthenticated={this.state.isAuthenticated} />
                 </NavItem>
                 <LoginMenu>
                 </LoginMenu>
