@@ -53,9 +53,7 @@ export class NavMenu extends Component {
                 <NavItem>
                   <NavLink tag={Link} className="text-dark" to="/fetch-data">Fetch data</NavLink>
                 </NavItem>
-                <NavItem>
-                  <SensorMenu tag={Link} isAuthenticated={this.state.isAuthenticated} />
-                </NavItem>
+                <SensorMenu tag={Link} isAuthenticated={this.state.isAuthenticated} />
                 <LoginMenu>
                 </LoginMenu>
               </ul>

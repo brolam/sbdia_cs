@@ -11,7 +11,7 @@ export default class AuthorizeRoute extends Component {
         this.state = {
             ready: false,
             authenticated: false,
-            token:""
+            token: ""
         };
     }
 
@@ -45,12 +45,12 @@ export default class AuthorizeRoute extends Component {
 
     async populateAuthenticationState() {
         const authenticated = await authService.isAuthenticated();
-        const token = authenticated?  await authService.getAccessToken() : "";
-        this.setState({ ready: true, authenticated, token:token });
+        const token = authenticated ? await authService.getAccessToken() : "";
+        this.setState({ ready: true, authenticated, token: token });
     }
 
     async authenticationChanged() {
-        this.setState({ ready: false, authenticated: false, token:"" });
+        this.setState({ ready: false, authenticated: false, token: "" });
         await this.populateAuthenticationState();
     }
 }

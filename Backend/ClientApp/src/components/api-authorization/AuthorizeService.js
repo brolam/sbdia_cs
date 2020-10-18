@@ -145,7 +145,8 @@ export class AuthorizeService {
             .map((element, index) => element.subscription === subscriptionId ? { found: true, index } : { found: false })
             .filter(element => element.found === true);
         if (subscriptionIndex.length !== 1) {
-            throw new Error(`Found an invalid number of subscriptions ${subscriptionIndex.length}`);
+            console.error(`Found an invalid number of subscriptions ${subscriptionIndex.length}`);
+            return
         }
 
         this._callbacks = this._callbacks.splice(subscriptionIndex[0].index, 1);
