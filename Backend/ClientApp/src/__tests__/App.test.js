@@ -18,7 +18,6 @@ afterEach(() => {
 });
 
 it("renders without crashing", async () => {
-
   await act(async () => {
     render(
       <MemoryRouter>
@@ -32,18 +31,17 @@ it("renders without crashing", async () => {
   expect(pretty(container.innerHTML)).toMatchInlineSnapshot(`
     "<div>
       <header>
-        <nav class=\\"navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3 navbar navbar-light\\">
-          <div class=\\"container\\"><a class=\\"navbar-brand\\" href=\\"/\\">SBDIA</a><button type=\\"button\\" class=\\"mr-2 navbar-toggler\\"><span class=\\"navbar-toggler-icon\\"></span></button>
-            <div class=\\"d-sm-inline-flex flex-sm-row-reverse collapse navbar-collapse\\">
-              <ul class=\\"navbar-nav flex-grow\\">
-                <li class=\\"nav-item\\"><a class=\\"text-dark nav-link\\" href=\\"/\\">Home</a></li>
-                <li class=\\"nav-item\\"><a class=\\"text-dark nav-link\\" href=\\"/counter\\">Counter</a></li>
-                <li class=\\"nav-item\\"><a class=\\"text-dark nav-link\\" href=\\"/fetch-data\\">Fetch data</a></li>
-                <li class=\\"nav-item\\"><a class=\\"text-dark nav-link\\" href=\\"/sensors\\">Sensors</a></li>
-                <li class=\\"nav-item\\"><a class=\\"text-dark nav-link\\" href=\\"/authentication/register\\">Register</a></li>
-                <li class=\\"nav-item\\"><a class=\\"text-dark nav-link\\" href=\\"/authentication/login\\">Login</a></li>
-              </ul>
-            </div>
+        <nav class=\\"navbar navbar-expand-lg navbar-dark bg-primary\\"><a class=\\"navbar-brand\\" href=\\"/\\">SBDIA</a><button class=\\"navbar-toggler\\" type=\\"button\\" data-toggle=\\"collapse\\" data-target=\\"#navbarSupportedContent\\" aria-controls=\\"navbarSupportedContent\\" aria-expanded=\\"true\\" aria-label=\\"Toggle navigation\\"><span class=\\"navbar-toggler-icon\\"></span></button>
+          <div class=\\"collapse navbar-collapse\\" id=\\"navbarSupportedContent\\">
+            <ul class=\\"navbar-nav mr-auto\\">
+              <li class=\\"nav-item active\\"><a class=\\"nav-link\\" href=\\"/\\">Home <span class=\\"sr-only\\">(current)</span></a></li>
+              <li class=\\"nav-item\\"><a class=\\"nav-link\\" href=\\"/counter\\">Counter</a></li>
+              <li class=\\"nav-item\\"><a class=\\"nav-link\\" href=\\"/fetch-data\\">Fetch data</a></li>
+              <li class=\\"nav-item\\"><a class=\\"nav-link\\" href=\\"/sensors\\">Sensors</a></li>
+              <li class=\\"nav-item active\\"><a class=\\"nav-link\\" href=\\"/authentication/register\\">Register</a></li>
+              <li class=\\"nav-item active\\"><a class=\\"nav-link\\" href=\\"/authentication/login\\">Login</a></li>
+            </ul>
+            <form class=\\"form-inline my-2 my-lg-0\\"><input class=\\"form-control mr-sm-2\\" type=\\"search\\" placeholder=\\"Search\\" aria-label=\\"Search\\"><button class=\\"btn btn-outline-light my-2 my-sm-0\\" type=\\"submit\\">Search</button></form>
           </div>
         </nav>
       </header>
