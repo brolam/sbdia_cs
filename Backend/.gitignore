@@ -198,8 +198,8 @@ UpgradeLog*.htm
 *.ldf
 
 # Sqlite
-app.db
-app_dev.db
+sbdia-dev.db
+sbdia-prod.db
 
 # Business Intelligence projects
 *.rdl.data

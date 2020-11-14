@@ -26,7 +26,7 @@ namespace Backend
         {
             string defaultConnection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<AppDbContext>(options =>
-                options.UseMySql(defaultConnection)
+                options.UseSqlite(defaultConnection)
             );
 
             services.AddDefaultIdentity<Owner>()
