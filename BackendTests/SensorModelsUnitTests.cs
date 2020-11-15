@@ -265,7 +265,7 @@ namespace BackendTest
             //Then
             Assert.NotEmpty(recentEneryLogs);
             Assert.Equal(2, recentEneryLogs.Length);
-            Assert.Equal(sensor.LogDurationMode, recentEneryLogs[1].Duration);
+            Assert.Equal(14, recentEneryLogs[1].Duration);
             Assert.Equal(15, recentEneryLogs[0].Duration);
             Assert.Equal((2 + 3 + 4) * sensor.DefaultToConvert, recentEneryLogs[0].WattsTotal);
             Assert.Equal((1 + 2 + 3) * sensor.DefaultToConvert, recentEneryLogs[1].WattsTotal);
