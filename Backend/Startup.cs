@@ -9,27 +9,21 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Backend.BackgroundServices;
-using System;
 
 namespace Backend
 {
   public class Startup
   {
-    private readonly IWebHostEnvironment env;
     private readonly IConfiguration configuration;
     public Startup(IConfiguration configuration, IWebHostEnvironment env)
     {
       this.configuration = configuration;
-      this.env = env;
     }
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
-      string defaultConnection = env.IsProduction() ?
-      Environment.GetEnvironmentVariable("DefaultConnection")
-      :
-      configuration.GetConnectionString("DefaultConnection");
+      string defaultConnection = configuration.GetConnectionString("DefaultConnection");
 
       services.AddDbContext<AppDbContext>(options =>
           options.UseSqlite(defaultConnection)
