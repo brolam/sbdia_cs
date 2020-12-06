@@ -25,5 +25,12 @@ namespace Backend.Models
     public float LogDurationMode { get; set; } = 14.00f;
     [Required, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public string SecretApiToken { get; set; } = Guid.NewGuid().ToString();
+    public DateTime ToDateTimeSensorTimeZone(long unixTimeSeconds)
+    {
+      DateTime dtUnixTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+      dtUnixTime = dtUnixTime.AddSeconds(unixTimeSeconds);
+      TimeZoneInfo sensorTimeZone = TimeZoneInfo.FindSystemTimeZoneById(this.TimeZone);
+      return TimeZoneInfo.ConvertTimeFromUtc(dtUnixTime, sensorTimeZone);
+    }
   }
 }
