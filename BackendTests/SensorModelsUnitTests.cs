@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BackendTest
 {
-  public class ModelsUnitTests : AppDbContextMock
+  public partial class ModelsUnitTests : AppDbContextMock
   {
 
     [Theory, InlineData("UserWithSensor@sbdia.iot")]
@@ -80,18 +80,17 @@ namespace BackendTest
       //Given
       var sensor = await CreateSensorAsync("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
       var sensorCost = this.DbContext.GetLastOrCreateSensorCost(sensor.Id);
-      var dateTime = new DateTime(year, month, day, hour, 0, 0);
-      var sensorDimTime = new SensorDimTime() { DateTime = dateTime, SensorId = sensor.Id, SensorCostId = sensorCost.Id };
+      var dateTime = new DateTimeOffset(year, month, day, hour, 0, 0, 0, TimeSpan.Zero);
       //When
-      this.DbContext.Add(sensorDimTime);
-      this.DbContext.SaveChanges();
+      var sensorDimTimeCreated = this.DbContext.GetOrCreateSensorDimTime(sensor, dateTime.ToUnixTimeSeconds());
+      var sensorDimTimeGot = this.DbContext.GetOrCreateSensorDimTime(sensor, dateTime.ToUnixTimeSeconds());
       //Then
-      var savedSensorDimTime = this.DbContext.GetSensorDimTime(sensor.Id, sensorDimTime.Id);
-      Assert.Equal(year, savedSensorDimTime.Year);
-      Assert.Equal(month, savedSensorDimTime.Month);
-      Assert.Equal(day, savedSensorDimTime.Day);
-      Assert.Equal(DayOfWeek.Friday, savedSensorDimTime.DayOfWeek);
-      Assert.Equal(PeriodOfDayTypes.Morning, savedSensorDimTime.PeriodOfDay);
+      Assert.Equal(year, sensorDimTimeCreated.Year);
+      Assert.Equal(month, sensorDimTimeCreated.Month);
+      Assert.Equal(day, sensorDimTimeCreated.Day);
+      Assert.Equal(DayOfWeek.Friday, sensorDimTimeCreated.DayOfWeek);
+      Assert.Equal(PeriodOfDayTypes.Morning, sensorDimTimeCreated.PeriodOfDay);
+      Assert.Equal(sensorDimTimeCreated.Id, sensorDimTimeGot.Id);
     }
 
     [Fact]
@@ -111,9 +110,9 @@ namespace BackendTest
     {
       //Given
       var sensor = await CreateSensorAsync("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
-      var sensorDimTime = this.DbContext.GetOrCreateSensorDimTime(unixTime, sensor);
+      var sensorDimTime = this.DbContext.GetOrCreateSensorDimTime(sensor, unixTime);
       //When
-      var savedSensorDimTime = this.DbContext.GetSensorDimTime(sensor.Id, sensorDimTime.Id);
+      var savedSensorDimTime = this.DbContext.GetSensorDimTime(sensor.Id, sensorDimTime.DateTime);
       //Then
       Assert.Equal(year, savedSensorDimTime.Year);
       Assert.Equal(month, savedSensorDimTime.Month);
@@ -145,7 +144,7 @@ namespace BackendTest
       //Given
       var sensor = await CreateSensorAsync("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
       var unixTime = 1574608324;
-      var sensorDimTime = this.DbContext.GetOrCreateSensorDimTime(unixTime, sensor);
+      var sensorDimTime = this.DbContext.GetOrCreateSensorDimTime(sensor, unixTime);
       const float Duration = 14.00F;
       const float Watts1 = 1.00F;
       const float Watts2 = 2.00F;
