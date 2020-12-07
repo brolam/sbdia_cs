@@ -57,7 +57,7 @@ namespace Backend.Data
     }
 
     #region Sensor
-    internal async Task<Sensor> GetSensor(string sensorId)
+    public async Task<Sensor> GetSensorAsync(string sensorId)
     {
       return await this.Sensors.FindAsync(sensorId);
     }

@@ -23,7 +23,6 @@ namespace Backend.Data
       foreach (var x in await xn)
       {
         listSensorXyDto.Add(new SensorXyDto(x.hour, await getSensorYAnsync(sensor, x.sensorDimTimeId)));
-
       }
       return listSensorXyDto.Cast<SensorXyDto>().ToArray();
     }
