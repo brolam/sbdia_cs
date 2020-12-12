@@ -8,6 +8,7 @@ import { Counter } from './components/Counter';
 import AuthorizeRoute from './components/api-authorization/AuthorizeRoute';
 import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
 import { ApplicationPaths } from './components/api-authorization/ApiAuthorizationConstants';
+import SensorNew from './components/Sensors/SensorNew'
 
 import './custom.css'
 
@@ -17,7 +18,8 @@ export default function App(props) {
       <Route exact path='/' component={Home} />
       <Route path='/counter' component={Counter} />
       <AuthorizeRoute path='/fetch-data' component={FetchData} />
-      <AuthorizeRoute path='/sensors' component={SensorsHome} />
+      <AuthorizeRoute exact path='/sensors' component={SensorsHome} />
+      <AuthorizeRoute exact path='/sensors/new' component={SensorNew} />
       <Route path={ApplicationPaths.ApiAuthorizationPrefix} component={ApiAuthorizationRoutes} />
     </Layout>
   );

@@ -12,7 +12,7 @@ export default function SensorMenu(props) {
         </Link>
         <div className="dropdown-menu" aria-labelledby="navbarDropdown">
           <Link className="dropdown-item" to="/sensors">List</Link>
-          <Link className="dropdown-item" to="/sensors">New</Link>
+          <Link className="dropdown-item" to="/sensors/new">New</Link>
         </div>
       </li>
     );
