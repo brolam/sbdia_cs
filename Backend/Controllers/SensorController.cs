@@ -56,7 +56,8 @@ namespace Backend.Controllers
       {
         Id = sensor.Id.ToString(),
         Name = sensor.Name,
-        SensorType = sensor.SensorType
+        SensorType = sensor.SensorType,
+        SecretApiToken = sensor.SecretApiToken
       };
     }
 

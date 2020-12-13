@@ -72,7 +72,8 @@ namespace Backend.Data
                       SensorType = sensor.SensorType,
                       SensorTypeName = sensor.SensorType.ToString(),
                       LogDurationMode = sensor.LogDurationMode,
-                      LogLastRecorded = new DateTime(2020, 10, 11, 12, 55, 59)
+                      LogLastRecorded = new DateTime(2020, 10, 11, 12, 55, 59),
+                      SecretApiToken = sensor.SecretApiToken
                     };
       return await sensors.ToArrayAsync();
     }
