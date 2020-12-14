@@ -9,6 +9,7 @@ import AuthorizeRoute from './components/api-authorization/AuthorizeRoute';
 import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
 import { ApplicationPaths } from './components/api-authorization/ApiAuthorizationConstants';
 import SensorNew from './components/Sensors/SensorNew'
+import Dashboards from './components/Dashboards'
 
 import './custom.css'
 
@@ -16,6 +17,7 @@ export default function App(props) {
   return (
     <Layout>
       <Route exact path='/' component={Home} />
+      <AuthorizeRoute path='/dashboards' component={Dashboards} />
       <Route path='/counter' component={Counter} />
       <AuthorizeRoute path='/fetch-data' component={FetchData} />
       <AuthorizeRoute exact path='/sensors' component={SensorsHome} />

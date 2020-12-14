@@ -1,8 +1,19 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Chart from "chart.js";
 
 export default function EnergyLogDashboard(props) {
+  const [state, setState] = useState({ sensors: [], loading: true, selectedSensor: null });
   var canvaChartRef = React.createRef();
+
+  async function populateSensorsList() {
+    const response = await fetch('api/sensor', {
+      headers: !props.token ? {} : { 'Authorization': `Bearer ${props.token}` }
+    });
+    const data = await response.json();
+    setState({ ...state, sensors: data, loading: false });
+  }
+
+  useEffect(() => { populateSensorsList(); }, [props.token]);
 
   useEffect(() => {
     console.log('ctx', canvaChartRef.current)
@@ -50,10 +61,32 @@ export default function EnergyLogDashboard(props) {
     })
   })
 
+  const onSelectedSensor = (sensor) => {
+    setState({ ...state, selectedSensor: sensor });
+  }
+
   return (
     <main role="main" className="col-md-16 ml-sm-auto col-lg-12 px-md-4">
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 className="h2">Dashboard</h1>
+        <div className="dropdown">
+          <a className="dropdown">
+            <h2 className="dropdown-toggle" to="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              {state.loading ?
+                "Dashboard loading" :
+                state.selectedSensor ?
+                  state.selectedSensor.name :
+                  "Select a Sensor"
+              }
+            </h2>
+            <div className="dropdown-menu" aria-labelledby="navbarDropdown">
+              {
+                state.sensors.map(sensor =>
+                  <a key={sensor.id} className="dropdown-item" onClick={(e) => { onSelectedSensor(sensor) }}>{sensor.name}</a>
+                )
+              }
+            </div>
+          </a>
+        </div>
         <div className="btn-toolbar mb-2 mb-md-0">
           <div className="btn-group mr-2">
             <button type="button" className="btn btn-sm btn-outline-secondary">Share</button>
