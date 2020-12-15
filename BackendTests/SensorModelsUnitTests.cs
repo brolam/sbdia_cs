@@ -172,7 +172,7 @@ namespace BackendTest
       Assert.NotEmpty(sensorLogBatchsUnprocessed);
       this.DbContext.PerformContentSensorLogBatch(sensor);
       sensorLogBatchsUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
-      var recentEneryLogs = this.DbContext.GetSensorEnergyLogsRecent(sensor);
+      var recentEneryLogs = await this.DbContext.GetSensorEnergyLogsRecentAsync(sensor);
       //Then
       Assert.Empty(sensorLogBatchsUnprocessed);
       Assert.NotEmpty(recentEneryLogs);
@@ -235,7 +235,7 @@ namespace BackendTest
       var sensorLogBatchsUnprocessed = this.DbContext.GetSensorLogBatchPending(sensor.Id);
       Assert.Equal(2, sensorLogBatchsUnprocessed.Length);
       this.DbContext.PerformContentSensorLogBatch(sensor);
-      var recentEneryLogs = this.DbContext.GetSensorEnergyLogsRecent(sensor);
+      var recentEneryLogs = await this.DbContext.GetSensorEnergyLogsRecentAsync(sensor);
 
       //Then
       Assert.NotEmpty(recentEneryLogs);
@@ -260,7 +260,7 @@ namespace BackendTest
       );
       //When
       this.DbContext.PerformContentSensorLogBatch(sensor);
-      var recentEneryLogs = this.DbContext.GetSensorEnergyLogsRecent(sensor);
+      var recentEneryLogs = await this.DbContext.GetSensorEnergyLogsRecentAsync(sensor);
       //Then
       Assert.NotEmpty(recentEneryLogs);
       Assert.Equal(2, recentEneryLogs.Length);
@@ -284,7 +284,7 @@ namespace BackendTest
       );
       //When
       this.DbContext.PerformContentSensorLogBatch(sensor);
-      var recentEneryLogs = this.DbContext.GetSensorEnergyLogsRecent(sensor);
+      var recentEneryLogs = await this.DbContext.GetSensorEnergyLogsRecentAsync(sensor);
       var sensorDto = this.DbContext.GetSensorDto(sensor.Id);
       //Then
       Assert.NotEmpty(recentEneryLogs);

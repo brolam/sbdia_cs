@@ -126,16 +126,14 @@ namespace BackendTest
         SecretApiToken = SecretApiTokenInvalid,
         Content = $"{log_at_15_20_00}"
       };
-
       //When
       var result = await this._controllerAllowAnonymous.PostSensorLogBatch
       (
           logBatchSecretApiTokenInvalid
       );
-
       //Then
       Assert.IsType<NotFoundResult>(result);
     }
-
   }
+
 }

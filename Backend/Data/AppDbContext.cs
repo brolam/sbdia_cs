@@ -206,20 +206,21 @@ namespace Backend.Data
       this.SaveChanges();
       return createSensorEnergyLog;
     }
-    public SensorEnergyLogItemDto[] GetSensorEnergyLogsRecent(Sensor sensor)
+    public Task<SensorEnergyLogItemDto[]> GetSensorEnergyLogsRecentAsync(Sensor sensor)
     {
       var logs = from log in this.SensorEnergyLogs
       .Where(log => log.SensorId == sensor.Id)
                  select new SensorEnergyLogItemDto()
                  {
                    Id = log.Id,
+                   UnixTime = log.UnixTime,
                    Duration = log.Duration,
                    Watts1 = log.Watts1,
                    Watts2 = log.Watts2,
                    Watts3 = log.Watts3,
                    WattsTotal = log.WattsTotal,
                  };
-      return logs.OrderByDescending(log => log.Id).Take(10).ToArray<SensorEnergyLogItemDto>();
+      return logs.OrderByDescending(log => log.Id).Take(10).ToArrayAsync<SensorEnergyLogItemDto>();
     }
     #endregion SensorEnergyLog
 
