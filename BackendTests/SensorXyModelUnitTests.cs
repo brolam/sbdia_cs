@@ -18,7 +18,7 @@ namespace BackendTest
       //When
       this.DbContext.PerformContentSensorLogBatch(sensor);
       int year = 2020, month = 7, day = 1;
-      var sensorXyHour = await this.DbContext.GetSensorXyAsync(sensor, year, month, day);
+      var sensorXyHour = await this.DbContext.GetSensorXyTotalKwhAsync(sensor, year, month, day);
       //Then
       Assert.NotEmpty(sensorXyHour);
       Assert.Equal(6, sensorXyHour[0].X);

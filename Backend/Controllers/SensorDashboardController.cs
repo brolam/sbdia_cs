@@ -11,10 +11,12 @@ namespace Backend.Controllers
     {
       var dashboardData = new Dictionary<string, object>();
       var sensor = await this._dbContext.GetSensorAsync(id);
-      var xy = await this._dbContext.GetSensorXyAsync(sensor, year, month, day);
+      var xyTotalKwh = await this._dbContext.GetSensorXyTotalKwhAsync(sensor, year, month, day);
+      var xyTotalDuration = await this._dbContext.GetSensorXyTotalDurationAsync(sensor, year, month, day);
       var logsRecent = await this._dbContext.GetSensorEnergyLogsRecentAsync(sensor);
+      dashboardData.Add("xyTotalKwh", xyTotalKwh);
+      dashboardData.Add("xyTotalDuration", xyTotalDuration);
       dashboardData.Add("logsRecent", logsRecent);
-      dashboardData.Add("xy", xy);
       return dashboardData;
     }
   }

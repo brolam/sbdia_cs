@@ -8,7 +8,7 @@ export default function EnergyLogDashboard(props) {
     sensors: [],
     loading: true,
     selectedSensor: null,
-    data: { xy: [], logsRecent: [] },
+    data: { xyTotalKwh: [], xyTotalDuration: [], logsRecent: [] },
     dataRefresh: 0
   });
   var canvaChartRef = React.createRef();
@@ -34,7 +34,7 @@ export default function EnergyLogDashboard(props) {
   useEffect(() => { populateSensorsList(); }, [props.token]);
   useEffect(() => { populateDashboardData(); }, [state.dataRefresh]);
   useEffect(() => {
-    var [x, y] = [state.data.xy.map(xy => xy.x), state.data.xy.map(xy => xy.y)]
+    var [x, y] = [state.data.xyTotalDuration.map(xy => xy.x), state.data.xyTotalDuration.map(xy => xy.y)]
     new Chart(canvaChartRef.current, {
       type: 'line',
       data: {
@@ -61,7 +61,7 @@ export default function EnergyLogDashboard(props) {
         }
       }
     })
-  });
+  }, [state.data.xyTotalKwh]);
 
   const onSelectedSensor = (sensor) => {
     setState({ ...state, selectedSensor: sensor, loading: true, dataRefresh: state.dataRefresh + 1 });
