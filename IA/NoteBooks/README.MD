@@ -6,9 +6,10 @@ pandas>=0.20.3
 jupyterlab
 sqlalchemy
 pymysql
+requests
 
 # Commands
 jupyter notebook --ip=0.0.0.0 --allow-root
-puapt install python3-pip
+apt install python3-pip
  alias python=python3
- lias pip=pip3
+ alias pip=pip3

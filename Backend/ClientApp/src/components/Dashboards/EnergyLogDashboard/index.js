@@ -8,8 +8,8 @@ export default function EnergyLogDashboard(props) {
     sensors: [],
     loading: true,
     selectedSensor: null,
-    data: [],
-    seconds: 0
+    data: { xy: [], logsRecent: [] },
+    dataRefresh: 0
   });
   var canvaChartRef = React.createRef();
 
@@ -19,49 +19,28 @@ export default function EnergyLogDashboard(props) {
     });
     const sensors = await response.json();
     setState({ ...state, sensors: sensors, loading: false });
-    console.log(state.sensors, props.token);
   }
 
   async function populateDashboardData() {
-    if (!state.selectedSensor) return;
+    if (!state.selectedSensor) return false;
     const sensorId = state.selectedSensor.id;
     const response = await fetch(`api/sensor/${sensorId}/dashboard/${year}/${month}/${day}`, {
       headers: !props.token ? {} : { 'Authorization': `Bearer ${props.token}` }
     });
     const data = await response.json();
-    setState({ ...state, data: data });
-    console.log(state.data, props.token);
+    setState({ ...state, data: data, loading: false });
   }
 
-  //setTimeout(() => setState({ ...state, seconds: state.seconds + 1 }), 15000);
-
   useEffect(() => { populateSensorsList(); }, [props.token]);
-
-  useEffect(() => { populateDashboardData(); }, [props.token, state.selectedSensor, state.seconds]);
-
+  useEffect(() => { populateDashboardData(); }, [state.dataRefresh]);
   useEffect(() => {
+    var [x, y] = [state.data.xy.map(xy => xy.x), state.data.xy.map(xy => xy.y)]
     new Chart(canvaChartRef.current, {
       type: 'line',
       data: {
-        labels: [
-          'Sunday',
-          'Monday',
-          'Tuesday',
-          'Wednesday',
-          'Thursday',
-          'Friday',
-          'Saturday'
-        ],
+        labels: x,
         datasets: [{
-          data: [
-            15339,
-            21345,
-            18483,
-            24003,
-            23489,
-            24092,
-            12034
-          ],
+          data: y,
           lineTension: 0,
           backgroundColor: 'transparent',
           borderColor: '#007bff',
@@ -82,10 +61,15 @@ export default function EnergyLogDashboard(props) {
         }
       }
     })
-  }, [state.data])
+  });
 
   const onSelectedSensor = (sensor) => {
-    setState({ ...state, selectedSensor: sensor });
+    setState({ ...state, selectedSensor: sensor, loading: true, dataRefresh: state.dataRefresh + 1 });
+  }
+
+  const onRefresh = () => {
+    if (state.loading) return;
+    setState({ ...state, loading: true, dataRefresh: state.dataRefresh + 1 });
   }
 
   return (
@@ -101,17 +85,18 @@ export default function EnergyLogDashboard(props) {
                   "Select a Sensor"
               }
             </h2>
-            <div className="dropdown-menu" aria-labelledby="navbarDropdown">
+            <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
               {
-                state.sensors.map(sensor =>
-                  <a key={sensor.id} className="dropdown-item" onClick={(e) => { onSelectedSensor(sensor) }}>{sensor.name}</a>
+                !state.loading && state.sensors.map(sensor =>
+                  <li key={sensor.id} className="dropdown-item" onClick={(e) => { onSelectedSensor(sensor) }}>{sensor.name}</li>
                 )
               }
-            </div>
+            </ul>
           </a>
         </div>
         <div className="btn-toolbar mb-2 mb-md-0">
           <div className="btn-group mr-2">
+            <button type="button" className="btn btn-sm btn-outline-secondary" onClick={(e) => onRefresh()} >Refresh</button>
             <button type="button" className="btn btn-sm btn-outline-secondary">Share</button>
             <button type="button" className="btn btn-sm btn-outline-secondary">Export</button>
           </div>
@@ -137,13 +122,13 @@ export default function EnergyLogDashboard(props) {
           </thead>
           <tbody>
             {state.data.logsRecent && state.data.logsRecent.map((log) => (
-              <tr>
-                <td>{Date(log.unixDate).substring(0, 21)}</td>
+              <tr key={log.id}>
+                <td>{log.dateTime}</td>
                 <td>{log.duration}</td>
-                <td>{log.watts1}</td>
-                <td>{log.watts2}</td>
-                <td>{log.watts3}</td>
-                <td>{log.wattsTotal}</td>
+                <td>{log.watts1.toFixed(2)}</td>
+                <td>{log.watts2.toFixed(2)}</td>
+                <td>{log.watts3.toFixed(2)}</td>
+                <td>{log.wattsTotal.toFixed(2)}</td>
               </tr>
             ))}
           </tbody>

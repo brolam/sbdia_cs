@@ -213,7 +213,7 @@ namespace Backend.Data
                  select new SensorEnergyLogItemDto()
                  {
                    Id = log.Id,
-                   UnixTime = log.UnixTime,
+                   DateTime = sensor.ToDateTimeSensorTimeZone(log.UnixTime),
                    Duration = log.Duration,
                    Watts1 = log.Watts1,
                    Watts2 = log.Watts2,
