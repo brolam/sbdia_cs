@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Backend.Data
 {
@@ -65,6 +66,14 @@ namespace Backend.Data
         return totalDuration;
       }
       throw new NotImplementedException();
+    }
+    public Task<string[]> GetSensorXyDaysAsync(Sensor sensor)
+    {
+      var days = this.SensorDimTimes
+      .Where(sensorDimTimes => sensorDimTimes.SensorId == sensor.Id)
+      .Select(sensorDimTime => $"{sensorDimTime.Year}/{sensorDimTime.Month:00}/{sensorDimTime.Day:00}")
+      .Distinct();
+      return days.ToArrayAsync();
     }
   }
 }

@@ -14,8 +14,10 @@ namespace Backend.Controllers
       var xyTotalKwh = await this._dbContext.GetSensorXyTotalKwhAsync(sensor, year, month, day);
       var xyTotalDuration = await this._dbContext.GetSensorXyTotalDurationAsync(sensor, year, month, day);
       var logsRecent = await this._dbContext.GetSensorEnergyLogsRecentAsync(sensor);
+      var xyDays = await this._dbContext.GetSensorXyDaysAsync(sensor);
       dashboardData.Add("xyTotalKwh", xyTotalKwh);
       dashboardData.Add("xyTotalDuration", xyTotalDuration);
+      dashboardData.Add("xyDays", xyDays);
       dashboardData.Add("logsRecent", logsRecent);
       return dashboardData;
     }
