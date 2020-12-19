@@ -21,17 +21,19 @@ namespace Backend.Data
       var xy = new ArrayList();
       foreach (var x in await hours)
       {
-        xy.Add(new SensorXyDto(x.hour, await getSensorTotalKwhAnsync(sensor, x.sensorDimTimeId)));
+        float totalWatts = await getSensorTotalWattsAnsync(sensor, x.sensorDimTimeId);
+        float totalKwh = totalWatts > 0 ? totalWatts / 3600.00f / 1000.00f : 0.00f;
+        xy.Add(new SensorXyDto(x.hour, totalKwh));
       }
       return xy.Cast<SensorXyDto>().ToArray();
     }
-    private Task<float> getSensorTotalKwhAnsync(Sensor sensor, long sensorDimTimeId)
+    private Task<float> getSensorTotalWattsAnsync(Sensor sensor, long sensorDimTimeId)
     {
       if (sensor.SensorType == SensorTypes.EnergyLog)
       {
         var wattsTotal = this.SensorEnergyLogs
         .Where(sensorEnergyLog => sensorEnergyLog.SensorDimTimeId == sensorDimTimeId)
-        .Select(sensorEnergyLog => sensorEnergyLog.WattsTotal)
+        .Select(sensorEnergyLog => sensorEnergyLog.WattsTotal * sensorEnergyLog.Duration)
         .SumAsync();
         return wattsTotal;
       }

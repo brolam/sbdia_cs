@@ -22,7 +22,7 @@ namespace BackendTest
       //Then
       Assert.NotEmpty(sensorXyHour);
       Assert.Equal(6, sensorXyHour[0].X);
-      Assert.Equal(949.608, Math.Round(sensorXyHour[0].Y, 3));
+      Assert.Equal(0.004, Math.Round(sensorXyHour[0].Y, 3));
     }
   }
 }

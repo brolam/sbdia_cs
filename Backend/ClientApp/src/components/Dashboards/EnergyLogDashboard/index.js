@@ -8,7 +8,13 @@ export default function EnergyLogDashboard(props) {
     sensors: [],
     loading: true,
     selectedSensor: null,
-    data: { xyTotalKwh: [], xyTotalDuration: [], logsRecent: [] },
+    data: {
+      xyTotalKwh: [],
+      xyTotalDuration: [],
+      logsRecent: [],
+      totalKwh: 0.00,
+      totalDuration: 0.00
+    },
     dataRefresh: 0
   });
   var canvaChartRef = React.createRef();
@@ -28,13 +34,17 @@ export default function EnergyLogDashboard(props) {
       headers: !props.token ? {} : { 'Authorization': `Bearer ${props.token}` }
     });
     const data = await response.json();
-    setState({ ...state, data: data, loading: false });
+    var totalKwh = 0.00, totalDuration = 0.00;
+    data.xyTotalKwh.map(xy => { totalKwh += xy.y })
+    data.xyTotalDuration.map(xy => { totalDuration += xy.y })
+    setState({ ...state, data: { ...data, totalKwh, totalDuration }, loading: false });
   }
 
   useEffect(() => { populateSensorsList(); }, [props.token]);
   useEffect(() => { populateDashboardData(); }, [state.dataRefresh]);
   useEffect(() => {
-    var [x, y] = [state.data.xyTotalDuration.map(xy => xy.x), state.data.xyTotalDuration.map(xy => xy.y)]
+    var [x, y] = [state.data.xyTotalKwh.map(xy => xy.x), state.data.xyTotalKwh.map(xy => xy.y)]
+    console.log(state.data);
     new Chart(canvaChartRef.current, {
       type: 'line',
       data: {
@@ -67,9 +77,18 @@ export default function EnergyLogDashboard(props) {
     setState({ ...state, selectedSensor: sensor, loading: true, dataRefresh: state.dataRefresh + 1 });
   }
 
-  const onRefresh = () => {
+  const onRefresh = (e) => {
     if (state.loading) return;
     setState({ ...state, loading: true, dataRefresh: state.dataRefresh + 1 });
+  }
+
+  const IconeReflesh = () => {
+    return (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+        <path fillRule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
+      </svg>
+    )
   }
 
   return (
@@ -94,17 +113,30 @@ export default function EnergyLogDashboard(props) {
             </ul>
           </a>
         </div>
-        <div className="btn-toolbar mb-2 mb-md-0">
-          <div className="btn-group mr-2">
-            <button type="button" className="btn btn-sm btn-outline-secondary" onClick={(e) => onRefresh()} >Refresh</button>
-            <button type="button" className="btn btn-sm btn-outline-secondary">Share</button>
-            <button type="button" className="btn btn-sm btn-outline-secondary">Export</button>
+        {(!state.loading && state.selectedSensor) &&
+          <div className="btn-toolbar mb-2 mb-md-0">
+            <div className="btn-group mr-2">
+              <button type="button" className="btn btn-sm btn-outline-secondary">
+                Kwh <span className="badge bg-secondary text-white">{state.data.totalKwh.toFixed(2)}</span>
+              </button>
+              <button type="button" className="btn btn-sm btn-outline-secondary">
+                Duration <span className="badge bg-secondary text-white">{state.data.totalDuration.toFixed(2)}</span>
+              </button>
+            </div>
+            <div className="row">
+              <div className="col">
+                <button type="button" className="btn btn-sm btn-outline-secondary dropdown-toggle">
+                  <span data-feather="calendar"></span>Day
+            </button>
+              </div>
+              <div className="col">
+                <button type="button" className="btn btn-sm btn-outline-secondary" onClick={(e) => onRefresh()}>
+                  <IconeReflesh />
+                </button>
+              </div>
+            </div>
           </div>
-          <button type="button" className="btn btn-sm btn-outline-secondary dropdown-toggle">
-            <span data-feather="calendar"></span>
-            This week
-          </button>
-        </div>
+        }
       </div>
       <canvas ref={canvaChartRef} className="my-4 w-100" id="myChart" width="1200" height="380"></canvas>
       <h2>Logs</h2>
@@ -134,6 +166,6 @@ export default function EnergyLogDashboard(props) {
           </tbody>
         </table>
       </div>
-    </main>
+    </main >
   )
 }

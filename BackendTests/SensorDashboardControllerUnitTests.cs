@@ -30,7 +30,7 @@ namespace BackendTest
       Assert.NotEmpty(xyTotalDuration);
       Assert.NotEmpty(logsRecent);
       Assert.Equal(15, xyTotalKwh[0].X);
-      Assert.Equal(633.072, Math.Round(xyTotalKwh[0].Y, 3));
+      Assert.Equal(0.003, Math.Round(xyTotalKwh[0].Y, 3));
     }
   }
 }
