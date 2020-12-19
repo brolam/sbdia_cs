@@ -26,9 +26,11 @@ namespace BackendTest
       var xyTotalKwh = Assert.IsType<SensorXyDto[]>(dashboardData["xyTotalKwh"]);
       var xyTotalDuration = Assert.IsType<SensorXyDto[]>(dashboardData["xyTotalDuration"]);
       var logsRecent = Assert.IsType<SensorEnergyLogItemDto[]>(dashboardData["logsRecent"]);
+      var xyDays = Assert.IsType<string[]>(dashboardData["xyDays"]);
       Assert.NotEmpty(xyTotalKwh);
       Assert.NotEmpty(xyTotalDuration);
       Assert.NotEmpty(logsRecent);
+      Assert.NotEmpty(xyDays);
       Assert.Equal(15, xyTotalKwh[0].X);
       Assert.Equal(0.003, Math.Round(xyTotalKwh[0].Y, 3));
     }

@@ -3,15 +3,17 @@ import Chart from "chart.js";
 
 export default function EnergyLogDashboard(props) {
   const [CHART_XY_KWH, CHART_XY_DURATION] = ["CHART_XY_KWH", "CHART_XY_DURATION"];
-  const date = new Date();
-  const [year, month, day] = [date.getFullYear(), date.getMonth() + 1, date.getDate()]
+  const toDay = new Date();
+  const [dafaultYear, dafaultMonth, defautlDay] = [toDay.getFullYear(), toDay.getMonth() + 1, toDay.getDate()]
   const [state, setState] = useState({
     sensors: [],
     loading: true,
     selectedSensor: null,
+    selectedXyDay: { year: dafaultYear, month: dafaultMonth, day: defautlDay },
     data: {
       xyTotalKwh: [],
       xyTotalDuration: [],
+      xyDays: [],
       logsRecent: [],
       totalKwh: 0.00,
       totalDuration: 0.00
@@ -32,6 +34,7 @@ export default function EnergyLogDashboard(props) {
   async function populateDashboardData() {
     if (!state.selectedSensor) return false;
     const sensorId = state.selectedSensor.id;
+    const { year, month, day } = state.selectedXyDay;
     const response = await fetch(`api/sensor/${sensorId}/dashboard/${year}/${month}/${day}`, {
       headers: !props.token ? {} : { 'Authorization': `Bearer ${props.token}` }
     });
@@ -76,7 +79,7 @@ export default function EnergyLogDashboard(props) {
         }
       }
     })
-  }, [state.data.xyTotalKwh, state.chartXyMetric]);
+  }, [state.data, state.chartXyMetric]);
 
   const onSelectedSensor = (sensor) => {
     setState({ ...state, selectedSensor: sensor, loading: true, dataRefresh: state.dataRefresh + 1 });
@@ -92,6 +95,12 @@ export default function EnergyLogDashboard(props) {
     setState({ ...state, chartXyMetric: metric });
   }
 
+  const onSelectedXyDay = (selectedDay) => {
+    if (state.loading) return;
+    const [year, month, day] = selectedDay.split("/");
+    setState({ ...state, loading: true, selectedXyDay: { year, month, day }, dataRefresh: state.dataRefresh + 1 });
+  }
+
   const IconeReflesh = () => {
     return (
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-clockwise" viewBox="0 0 16 16">
@@ -104,25 +113,23 @@ export default function EnergyLogDashboard(props) {
   return (
     <main role="main" className="col-md-16 ml-sm-auto col-lg-12 px-md-4">
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <div className="dropdown">
-          <a className="dropdown">
-            <h2 className="dropdown-toggle" to="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              {state.loading ?
-                "Dashboard loading" :
-                state.selectedSensor ?
-                  state.selectedSensor.name :
-                  "Select a Sensor"
-              }
-            </h2>
-            <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
-              {
-                !state.loading && state.sensors.map(sensor =>
-                  <li key={sensor.id} className="dropdown-item" onClick={(e) => { onSelectedSensor(sensor) }}>{sensor.name}</li>
-                )
-              }
-            </ul>
-          </a>
-        </div>
+        <a className="dropdown">
+          <h2 className="dropdown-toggle" to="#" id="dropdownSensors" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {state.loading ?
+              "Dashboard loading" :
+              state.selectedSensor ?
+                state.selectedSensor.name :
+                "Select a Sensor"
+            }
+          </h2>
+          <ul className="dropdown-menu" aria-labelledby="dropdownSensors">
+            {
+              !state.loading && state.sensors.map(sensor =>
+                <li key={sensor.id} className="dropdown-item" onClick={(e) => { onSelectedSensor(sensor) }}>{sensor.name}</li>
+              )
+            }
+          </ul>
+        </a>
         {(!state.loading && state.selectedSensor) &&
           <div className="btn-toolbar mb-2 mb-md-0">
             <div className="btn-group mr-2">
@@ -135,9 +142,20 @@ export default function EnergyLogDashboard(props) {
             </div>
             <div className="row">
               <div className="col">
-                <button type="button" className="btn btn-sm btn-outline-secondary dropdown-toggle">
-                  <span data-feather="calendar"></span>Day
-            </button>
+                <div className="dropdown">
+                  <button type="button" id="dropdownDays" className="btn btn-sm btn-outline-secondary dropdown-toggle" data-toggle="dropdown" >
+                    <span data-feather="calendar">
+                      {state.selectedXyDay.year}/{state.selectedXyDay.month}/{state.selectedXyDay.day}
+                    </span>
+                  </button>
+                  <ul className="dropdown-menu" aria-labelledby="dropdownDays">
+                    {
+                      !state.loading && state.data.xyDays.map(day =>
+                        <li key={day} className="dropdown-item" onClick={e => onSelectedXyDay(day)} >{day}</li>
+                      )
+                    }
+                  </ul>
+                </div>
               </div>
               <div className="col">
                 <button type="button" className="btn btn-sm btn-outline-secondary" onClick={(e) => onRefresh()}>
