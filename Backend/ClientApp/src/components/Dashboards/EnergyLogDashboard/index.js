@@ -169,26 +169,26 @@ export default function EnergyLogDashboard(props) {
       <canvas ref={canvaChartRef} className="my-4 w-100" id="myChart" width="1200" height="380"></canvas>
       <h2>Logs</h2>
       <div className="table-responsive">
-        <table className="table table-striped table-sm">
+        <table className="table">
           <thead>
             <tr>
               <th>When</th>
-              <th>Duration</th>
-              <th>Phase 01</th>
-              <th>Phase 02</th>
-              <th>Phase 03</th>
-              <th>Total Watts</th>
+              <th className="text-center">Duration</th>
+              <th className="text-right d-none d-lg-table-cell">Phase 01</th>
+              <th className="text-right d-none d-lg-table-cell">Phase 02</th>
+              <th className="text-right d-none d-lg-table-cell">Phase 03</th>
+              <th className="text-right">Total Watts</th>
             </tr>
           </thead>
           <tbody>
             {state.data.logsRecent && state.data.logsRecent.map((log) => (
               <tr key={log.id}>
                 <td>{log.dateTime}</td>
-                <td>{log.duration}</td>
-                <td>{log.watts1.toFixed(2)}</td>
-                <td>{log.watts2.toFixed(2)}</td>
-                <td>{log.watts3.toFixed(2)}</td>
-                <td>{log.wattsTotal.toFixed(2)}</td>
+                <td className="text-center">{log.duration}</td>
+                <td className="text-right d-none d-lg-table-cell">{log.watts1.toFixed(2)}</td>
+                <td className="text-right d-none d-lg-table-cell">{log.watts2.toFixed(2)}</td>
+                <td className="text-right d-none d-lg-table-cell">{log.watts3.toFixed(2)}</td>
+                <td className="text-right">{log.wattsTotal.toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
