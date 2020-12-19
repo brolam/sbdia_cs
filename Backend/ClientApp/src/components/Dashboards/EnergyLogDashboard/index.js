@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Chart from "chart.js";
 
 export default function EnergyLogDashboard(props) {
+  const [CHART_XY_KWH, CHART_XY_DURATION] = ["CHART_XY_KWH", "CHART_XY_DURATION"];
   const date = new Date();
   const [year, month, day] = [date.getFullYear(), date.getMonth() + 1, date.getDate()]
   const [state, setState] = useState({
@@ -15,6 +16,7 @@ export default function EnergyLogDashboard(props) {
       totalKwh: 0.00,
       totalDuration: 0.00
     },
+    chartXyMetric: CHART_XY_KWH,
     dataRefresh: 0
   });
   var canvaChartRef = React.createRef();
@@ -43,8 +45,11 @@ export default function EnergyLogDashboard(props) {
   useEffect(() => { populateSensorsList(); }, [props.token]);
   useEffect(() => { populateDashboardData(); }, [state.dataRefresh]);
   useEffect(() => {
-    var [x, y] = [state.data.xyTotalKwh.map(xy => xy.x), state.data.xyTotalKwh.map(xy => xy.y)]
-    console.log(state.data);
+    var [x, y] = state.chartXyMetric == CHART_XY_KWH ?
+      [state.data.xyTotalKwh.map(xy => xy.x), state.data.xyTotalKwh.map(xy => xy.y)]
+      :
+      [state.data.xyTotalDuration.map(xy => xy.x), state.data.xyTotalDuration.map(xy => xy.y)]
+
     new Chart(canvaChartRef.current, {
       type: 'line',
       data: {
@@ -71,7 +76,7 @@ export default function EnergyLogDashboard(props) {
         }
       }
     })
-  }, [state.data.xyTotalKwh]);
+  }, [state.data.xyTotalKwh, state.chartXyMetric]);
 
   const onSelectedSensor = (sensor) => {
     setState({ ...state, selectedSensor: sensor, loading: true, dataRefresh: state.dataRefresh + 1 });
@@ -80,6 +85,11 @@ export default function EnergyLogDashboard(props) {
   const onRefresh = (e) => {
     if (state.loading) return;
     setState({ ...state, loading: true, dataRefresh: state.dataRefresh + 1 });
+  }
+
+  const onSelectedChartXyMetric = (metric) => {
+    if (state.loading) return;
+    setState({ ...state, chartXyMetric: metric });
   }
 
   const IconeReflesh = () => {
@@ -116,10 +126,10 @@ export default function EnergyLogDashboard(props) {
         {(!state.loading && state.selectedSensor) &&
           <div className="btn-toolbar mb-2 mb-md-0">
             <div className="btn-group mr-2">
-              <button type="button" className="btn btn-sm btn-outline-secondary">
+              <button type="button" className={state.chartXyMetric == CHART_XY_KWH ? "btn btn-sm btn-outline-secondary active" : "btn btn-sm btn-outline-secondary"} onClick={(e) => onSelectedChartXyMetric(CHART_XY_KWH)}>
                 Kwh <span className="badge bg-secondary text-white">{state.data.totalKwh.toFixed(2)}</span>
               </button>
-              <button type="button" className="btn btn-sm btn-outline-secondary">
+              <button type="button" className={state.chartXyMetric == CHART_XY_DURATION ? "btn btn-sm btn-outline-secondary active" : "btn btn-sm btn-outline-secondary"} onClick={(e) => onSelectedChartXyMetric(CHART_XY_DURATION)}>
                 Duration <span className="badge bg-secondary text-white">{state.data.totalDuration.toFixed(2)}</span>
               </button>
             </div>
