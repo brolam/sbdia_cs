@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Backend.Models.Dtos;
 using BackendTests.Mocks;
+using System.Collections.Generic;
 
 namespace BackendTest
 {
@@ -133,6 +134,17 @@ namespace BackendTest
       );
       //Then
       Assert.IsType<NotFoundResult>(result);
+    }
+
+    [Fact]
+    public void GetSensorTimeZones()
+    {
+      //Given
+      var actionResult = this._controller.GetSensorTimeZones();
+      //When
+      var timeZones = Assert.IsType<Dictionary<string, string>>(actionResult.Value);
+      //Then
+      Assert.NotEmpty(timeZones);
     }
   }
 

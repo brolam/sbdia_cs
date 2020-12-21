@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -40,6 +41,18 @@ namespace Backend.Controllers
       }
 
       return sensor;
+    }
+
+    [HttpGet("timeZones")]
+    public ActionResult<Dictionary<string, string>> GetSensorTimeZones()
+    {
+      var timeZones = TimeZoneInfo.GetSystemTimeZones();
+      var timeZonesResult = new Dictionary<string, string>();
+      foreach (var timeZone in timeZones)
+      {
+        timeZonesResult.Add(timeZone.Id, timeZone.DaylightName);
+      }
+      return timeZonesResult;
     }
 
     [HttpPost]
