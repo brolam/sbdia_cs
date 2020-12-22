@@ -105,7 +105,13 @@ namespace Backend.Data
     public Sensor CreateSensor(string userId, SensorItemDto sensorItemDto)
     {
       var owner = this.Users.Find(userId);
-      var sensor = new Sensor() { OwnerId = owner.Id, Name = sensorItemDto.Name, SensorType = sensorItemDto.SensorType };
+      var sensor = new Sensor()
+      {
+        OwnerId = owner.Id,
+        Name = sensorItemDto.Name,
+        SensorType = sensorItemDto.SensorType,
+        TimeZone = sensorItemDto.TimeZone
+      };
       this.Add(sensor);
       this.SaveChanges();
       return sensor;

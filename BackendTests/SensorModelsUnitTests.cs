@@ -28,7 +28,7 @@ namespace BackendTest
     {
       //Given
       var user = CreateUser(userEmail);
-      var sensor = this.DbContext.CreateSensor(user.Id, new SensorItemDto() { Name = sensorName, SensorType = sensorType });
+      var sensor = this.DbContext.CreateSensor(user.Id, new SensorItemDto() { Name = sensorName, SensorType = sensorType, TimeZone = TimeZoneInfo.Local.Id });
       //When
       var userSensors = await this.DbContext.GetSensors(user.Id);
       //Then

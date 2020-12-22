@@ -41,7 +41,7 @@ namespace BackendTest
     public SensorItemDto CreateSensor()
     {
       // Act
-      var sensorItemDto = new SensorItemDto() { Name = "Sensor 01", SensorType = SensorTypes.EnergyLog };
+      var sensorItemDto = new SensorItemDto() { Name = "Sensor 01", SensorType = SensorTypes.EnergyLog, TimeZone = System.TimeZoneInfo.Local.Id };
       var actionResult = _controller.CreateSensor(sensorItemDto);
       var sensorItemDtoResult = Assert.IsType<SensorItemDto>(((CreatedAtActionResult)actionResult.Result).Value);
       // Assert
@@ -142,7 +142,7 @@ namespace BackendTest
       //Given
       var actionResult = this._controller.GetSensorTimeZones();
       //When
-      var timeZones = Assert.IsType<Dictionary<string, string>>(actionResult.Value);
+      var timeZones = Assert.IsType<string[]>(actionResult.Value);
       //Then
       Assert.NotEmpty(timeZones);
     }

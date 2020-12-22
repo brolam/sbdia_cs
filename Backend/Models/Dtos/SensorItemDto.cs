@@ -16,5 +16,6 @@ namespace Backend.Models.Dtos
     public float LogDurationMode { get; set; }
     public DateTime LogLastRecorded { get; set; }
     public string SecretApiToken { get; set; }
+    public string TimeZone { get; set; }
   }
 }

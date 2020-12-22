@@ -64,7 +64,8 @@ namespace BackendTests
       var sensor = this.DbContext.CreateSensor(newUser.Id, new SensorItemDto()
       {
         Name = sensorName,
-        SensorType = SensorTypes.EnergyLog
+        SensorType = SensorTypes.EnergyLog,
+        TimeZone = System.TimeZoneInfo.Local.Id
       });
       return sensor;
     }

@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -22,7 +23,6 @@ namespace Backend.Controllers
     {
       _dbContext = dbContext;
     }
-
     [HttpGet]
     public async Task<ActionResult<IEnumerable<SensorItemDto>>> GetSensorAll()
     {
@@ -44,13 +44,15 @@ namespace Backend.Controllers
     }
 
     [HttpGet("timeZones")]
-    public ActionResult<Dictionary<string, string>> GetSensorTimeZones()
+    public ActionResult<string[]> GetSensorTimeZones()
     {
       var timeZones = TimeZoneInfo.GetSystemTimeZones();
-      var timeZonesResult = new Dictionary<string, string>();
+      var timeZonesResult = new string[timeZones.Count];
+      var index = 0;
       foreach (var timeZone in timeZones)
       {
-        timeZonesResult.Add(timeZone.Id, timeZone.DaylightName);
+        timeZonesResult[index] = timeZone.Id;
+        index++;
       }
       return timeZonesResult;
     }
