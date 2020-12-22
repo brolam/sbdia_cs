@@ -183,7 +183,7 @@ export default function EnergyLogDashboard(props) {
           <tbody>
             {state.data.logsRecent && state.data.logsRecent.map((log) => (
               <tr key={log.id}>
-                <td>{log.dateTime}</td>
+                <td>{(new Date(log.dateTime)).toLocaleString()}</td>
                 <td className="text-center">{log.duration}</td>
                 <td className="text-right d-none d-lg-table-cell">{log.watts1.toFixed(2)}</td>
                 <td className="text-right d-none d-lg-table-cell">{log.watts2.toFixed(2)}</td>
