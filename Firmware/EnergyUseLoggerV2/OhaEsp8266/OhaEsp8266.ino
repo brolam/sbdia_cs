@@ -1,4 +1,4 @@
-//#define DEBUG 1
+//define DEBUG 1
 //#define ENV_PROD 1
 
 # if ENV_PROD
@@ -18,7 +18,10 @@ const char* ssid     = WIFI_SSID;
 const char* password = WIFI_PASSWORD;
 const int INTERVAL_TIME_SAVE_LOG = 10;
 //SHA1 finger print of certificate use web browser to view and copy
-const char fingerprint[] PROGMEM = "8B 00 83 0B CC F2 46 F7 96 D3 8E B5 E1 2F CF BD 1D 3A 61 50";
+//Azure const char fingerprint[] PROGMEM = "8B 00 83 0B CC F2 46 F7 96 D3 8E B5 E1 2F CF BD 1D 3A 61 50";
+//Azure const String host = "sbdia.azurewebsites.net";
+const char fingerprint[] PROGMEM = "83 9A FD D6 EE 72 6C BF 60 9F C2 E6 50 E1 C3 42 D2 7B 6A E6";
+
 
 long lastLogRegistered = 0;
 long lastPositionFileLogSent = 0;
@@ -79,7 +82,6 @@ void setup() {
     Serial.println("SPIFFS Initialization...failed");
 #endif
   }
-
   //Format File System
   /*
     if (SPIFFS.format())
@@ -90,24 +92,17 @@ void setup() {
     {
     Serial.println("File System Formatting Error");
     }
-  */
-  SPIFFS.info(fs_info);
-
+   */
 #ifdef DEBUG
-
-
+  SPIFFS.info(fs_info);
   Serial.print("totalBytes: ");
   Serial.println(fs_info.totalBytes);
-
   Serial.print("usedBytes: ");
   Serial.println(fs_info.usedBytes);
-
   Serial.print("blockSize: ");
   Serial.println(fs_info.blockSize);
-
   Serial.print("pageSize: ");
   Serial.println(fs_info.pageSize);
-
   Serial.print("maxOpenFiles: ");
   Serial.println(fs_info.maxOpenFiles);
 #endif
@@ -148,8 +143,9 @@ void sendLogs() {
   httpsClient.setFingerprint(fingerprint);
   httpsClient.setTimeout(15000); // 15 Seconds
   delay(1000);
+/*  
   int r=0; //retry counter
-  while((!httpsClient.connect("sbdia.azurewebsites.net", 443)) && (r < 30)){
+  while((!httpsClient.connect(host, 443)) && (r < 30)){
     delay(100);
 #ifdef DEBUG
     Serial.print(".");
@@ -164,7 +160,7 @@ void sendLogs() {
     Serial.println("Connected to web");
   }
 #endif
-
+*/
     http.begin(httpsClient, String(END_POINT_URL));
     http.addHeader("Content-Type", "application/json");
     int httpResponseCode = http.POST(
