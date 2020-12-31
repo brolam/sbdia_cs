@@ -29,8 +29,8 @@ namespace Backend.Models
     internal void CalculateDuration(float logDurationMode, SensorEnergyLog lastEnergyLog)
     {
       var calDuration = (this.UnixTime - lastEnergyLog.UnixTime);
-      var twentyPercent = logDurationMode * 0.20;
-      if ((calDuration < (logDurationMode - twentyPercent) || (calDuration > (logDurationMode + twentyPercent))))
+      var eightyPercent = logDurationMode * 0.80;
+      if ((calDuration < (logDurationMode - eightyPercent) || (calDuration > (logDurationMode + eightyPercent))))
         this.Duration = logDurationMode;
       else
         this.Duration = calDuration;
