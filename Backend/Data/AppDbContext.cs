@@ -256,7 +256,7 @@ namespace Backend.Data
         {
           Func<long, long> getSensorDimTimeId = (unixTime) => this.GetOrCreateSensorDimTime(sensor, unixTime).Id;
           var newEnergyLog = SensorEnergyLog.Parse(sensor, getSensorDimTimeId, contentLogItem);
-          if (previousLog != null) newEnergyLog.CalculateDuration(previousLog);
+          if (previousLog != null) newEnergyLog.CalculateDuration(sensor.LogDurationMode, previousLog);
           this.SensorEnergyLogs.Add(newEnergyLog);
           this.SaveOrUpdateSensorEnergyLog(newEnergyLog);
           previousLog = newEnergyLog;
