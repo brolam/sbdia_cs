@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import Chart from "chart.js";
-
+var chartXy = null;
 export default function EnergyLogDashboard(props) {
+
   const [CHART_XY_KWH, CHART_XY_DURATION] = ["CHART_XY_KWH", "CHART_XY_DURATION"];
   const toDay = new Date();
   const [dafaultYear, dafaultMonth, defautlDay] = [toDay.getFullYear(), toDay.getMonth() + 1, toDay.getDate()]
@@ -28,7 +29,10 @@ export default function EnergyLogDashboard(props) {
       headers: !props.token ? {} : { 'Authorization': `Bearer ${props.token}` }
     });
     const sensors = await response.json();
-    setState({ ...state, sensors: sensors, loading: false });
+    const selectedSensor = sensors && !state.selectedSensor ? sensors[0] : state.selectedSensor;
+    setState({ ...state, sensors: sensors, selectedSensor: selectedSensor, loading: false });
+    if (selectedSensor) populateDashboardData();
+
   }
 
   async function populateDashboardData() {
@@ -52,8 +56,13 @@ export default function EnergyLogDashboard(props) {
       [state.data.xyTotalKwh.map(xy => xy.x), state.data.xyTotalKwh.map(xy => xy.y)]
       :
       [state.data.xyTotalDuration.map(xy => xy.x), state.data.xyTotalDuration.map(xy => xy.y)]
-
-    new Chart(canvaChartRef.current, {
+    if (chartXy) {
+      chartXy.data.labels = x;
+      chartXy.data.datasets[0].data = y;
+      chartXy.update();
+      return;
+    }
+    chartXy = new Chart(canvaChartRef.current, {
       type: 'line',
       data: {
         labels: x,
