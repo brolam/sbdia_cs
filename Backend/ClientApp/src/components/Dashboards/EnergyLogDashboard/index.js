@@ -29,15 +29,12 @@ export default function EnergyLogDashboard(props) {
       headers: !props.token ? {} : { 'Authorization': `Bearer ${props.token}` }
     });
     const sensors = await response.json();
-    const selectedSensor = sensors && !state.selectedSensor ? sensors[0] : state.selectedSensor;
-    setState({ ...state, sensors: sensors, selectedSensor: selectedSensor, loading: false });
-    if (selectedSensor) populateDashboardData();
-
+    setState({ ...state, sensors: sensors, loading: false });
   }
 
-  async function populateDashboardData() {
-    if (!state.selectedSensor) return false;
-    const sensorId = state.selectedSensor.id;
+  async function populateDashboardData(selectedSensor) {
+    if (!selectedSensor) return false;
+    const sensorId = selectedSensor.id;
     const { year, month, day } = state.selectedXyDay;
     const response = await fetch(`api/sensor/${sensorId}/dashboard/${year}/${month}/${day}`, {
       headers: !props.token ? {} : { 'Authorization': `Bearer ${props.token}` }
@@ -50,24 +47,14 @@ export default function EnergyLogDashboard(props) {
   }
 
   useEffect(() => { populateSensorsList(); }, [props.token]);
-  useEffect(() => { populateDashboardData(); }, [state.dataRefresh]);
+  useEffect(() => { populateDashboardData(state.selectedSensor); }, [state.dataRefresh]);
   useEffect(() => {
-    var [x, y] = state.chartXyMetric == CHART_XY_KWH ?
-      [state.data.xyTotalKwh.map(xy => xy.x), state.data.xyTotalKwh.map(xy => xy.y)]
-      :
-      [state.data.xyTotalDuration.map(xy => xy.x), state.data.xyTotalDuration.map(xy => xy.y)]
-    if (chartXy) {
-      chartXy.data.labels = x;
-      chartXy.data.datasets[0].data = y;
-      chartXy.update();
-      return;
-    }
     chartXy = new Chart(canvaChartRef.current, {
       type: 'line',
       data: {
-        labels: x,
+        labels: [],
         datasets: [{
-          data: y,
+          data: [],
           lineTension: 0,
           backgroundColor: 'transparent',
           borderColor: '#007bff',
@@ -88,6 +75,15 @@ export default function EnergyLogDashboard(props) {
         }
       }
     })
+  }, []);
+  useEffect(() => {
+    var [x, y] = state.chartXyMetric == CHART_XY_KWH ?
+      [state.data.xyTotalKwh.map(xy => xy.x), state.data.xyTotalKwh.map(xy => xy.y)]
+      :
+      [state.data.xyTotalDuration.map(xy => xy.x), state.data.xyTotalDuration.map(xy => xy.y)]
+    chartXy.data.labels = x;
+    chartXy.data.datasets[0].data = y;
+    chartXy.update();
   }, [state.data, state.chartXyMetric]);
 
   const onSelectedSensor = (sensor) => {
