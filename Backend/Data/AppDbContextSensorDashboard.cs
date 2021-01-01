@@ -23,7 +23,7 @@ namespace Backend.Data
       foreach (var x in await hours)
       {
         float totalWatts = await getSensorTotalWattsAnsync(sensor, x.sensorDimTimeId);
-        float totalKwh = totalWatts > 0 ? totalWatts / 3600.00f / 1000.00f : 0.00f;
+        float totalKwh = (float)Math.Round(totalWatts > 0 ? totalWatts / 3600.00f / 1000.00f : 0.00f, 2);
         xy.Add(new SensorXyDto(x.hour, totalKwh));
       }
       return xy.Cast<SensorXyDto>().ToArray();
@@ -50,7 +50,7 @@ namespace Backend.Data
       foreach (var x in await hours)
       {
         float duratioToHour = await getSensorSumDurationAnsync(sensor, x.sensorDimTimeId);
-        if (duratioToHour > 0) duratioToHour = duratioToHour / 3600.00f;
+        if (duratioToHour > 0) duratioToHour = (float)Math.Round(duratioToHour / 3600.00f, 2);
         xy.Add(new SensorXyDto(x.hour, duratioToHour));
       }
       return xy.Cast<SensorXyDto>().ToArray();
