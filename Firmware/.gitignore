@@ -1,6 +1,7 @@
 #O Config_model.h é somente um modelo, sendo assim, as novas configurações serão ignoradas.  
 Config.h
-Config_dev.h
-Config_prod.h
+*_dev.h
+*_prod.h
 *.db-shm
 *.db-wal
+.DS_Store
