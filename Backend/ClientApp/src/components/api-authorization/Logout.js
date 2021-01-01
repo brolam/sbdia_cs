@@ -73,7 +73,7 @@ export class Logout extends Component {
                 case AuthenticationResultStatus.Redirect:
                     break;
                 case AuthenticationResultStatus.Success:
-                    await this.navigateToReturnUrl(returnUrl);
+                    this.navigateToReturnUrl(returnUrl);
                     break;
                 case AuthenticationResultStatus.Fail:
                     this.setState({ message: result.message });
@@ -95,7 +95,7 @@ export class Logout extends Component {
                 // is when we are doing a redirect sign in flow.
                 throw new Error('Should not redirect.');
             case AuthenticationResultStatus.Success:
-                await this.navigateToReturnUrl(this.getReturnUrl(result.state));
+                this.navigateToReturnUrl(this.getReturnUrl(result.state));
                 break;
             case AuthenticationResultStatus.Fail:
                 this.setState({ message: result.message });
