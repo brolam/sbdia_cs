@@ -48,7 +48,7 @@ namespace Backend.Data
 
     private void PerformSensorEnergyLogBatch(Sensor sensor, SensorLogBatch sensorLogBatch)
     {
-      SensorEnergyLog previousLog = null;
+      SensorEnergyLog previousLog = GetSensorEnergyLogLast(sensor);
       try
       {
         foreach (var contentLogItem in sensorLogBatch.Content.Split("|"))
@@ -109,6 +109,12 @@ namespace Backend.Data
         this.SaveChanges();
       }
     }
+    public SensorEnergyLog GetSensorEnergyLogLast(Sensor sensor)
+    {
+      return this.SensorEnergyLogs
+      .Where(log => log.SensorId == sensor.Id)
+      .OrderByDescending(log => log.UnixTime)
+      .FirstOrDefault();
+    }
   }
-
 }

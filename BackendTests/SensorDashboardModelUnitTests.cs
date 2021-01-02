@@ -23,7 +23,7 @@ namespace BackendTest
       //Then
       Assert.NotEmpty(sensorXyHour);
       Assert.Equal(6, sensorXyHour[0].X);
-      Assert.Equal(0.004, Math.Round(sensorXyHour[0].Y, 3));
+      Assert.Equal(0.00, Math.Round(sensorXyHour[0].Y, 3));
     }
     [Fact]
     public async Task GetSensorXyTotalDurationAsync()
@@ -40,7 +40,7 @@ namespace BackendTest
       //Then
       Assert.NotEmpty(sensorXyHour);
       Assert.Equal(6, sensorXyHour[0].X);
-      Assert.Equal(0.023, Math.Round(sensorXyHour[0].Y, 3));
+      Assert.Equal(0.02, Math.Round(sensorXyHour[0].Y, 3));
     }
     [Fact]
     public async Task GetSensorXyDaysAsync()

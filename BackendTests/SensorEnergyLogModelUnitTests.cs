@@ -24,6 +24,19 @@ namespace BackendTest
       Assert.Equal(14, sensorEnergyLogs[0].Duration);
       Assert.Equal(14, sensorEnergyLogs[1].Duration);
     }
-
+    [Fact]
+    public async void GetSensorEnergyLogLast()
+    {
+      //Given
+      var (sensor, sensorLogBatchsUnprocessed) = await this.CreateSensorLogBatchEnergyLogAsync
+      (
+        "1593584095;1;2;3|1593584123;1;2;3"
+      );
+      //When
+      this.DbContext.PerformContentSensorLogBatch(sensor);
+      var energyLogLast = this.DbContext.GetSensorEnergyLogLast(sensor);
+      //Then
+      Assert.Equal(1593584123, energyLogLast.UnixTime);
+    }
   }
 }
