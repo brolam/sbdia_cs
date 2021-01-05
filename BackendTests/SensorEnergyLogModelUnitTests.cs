@@ -227,5 +227,24 @@ namespace BackendTest
       Assert.Equal("1,6,EarlyMorning,Wednesday,1593584095,14,26.378,52.756,79.134,158.268", rows[1]);
       Assert.Equal("1,6,EarlyMorning,Wednesday,1593584123,14,26.378,52.756,79.134,158.268", rows[2]);
     }
+
+    [Fact]
+    public async void GetSensorEnergyLogsToCsvEmpty()
+    {
+      //Given
+      var (sensor, sensorLogBatchsUnprocessed) = await this.CreateSensorLogBatchEnergyLogAsync
+      (
+        "1593584095;1;2;3|1593584123;1;2;3"
+      );
+      //When
+      this.DbContext.PerformContentSensorLogBatch(sensor);
+      var energyLogsToCsv = this.DbContext.GetSensorEnergyLogsToCsv(sensor, 2020, 9);
+      Assert.NotEmpty(energyLogsToCsv.ToString());
+      var rows = energyLogsToCsv.ToString().Split(Environment.NewLine);
+      //Then
+      Assert.Equal(2, rows.Length);
+      Assert.Equal("", rows[1]);
+    }
+
   }
 }

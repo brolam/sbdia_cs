@@ -123,7 +123,7 @@ namespace Backend.Data
       builder.AppendLine("Day,Hour,PeriodOfDay,DayOfWeek,UnixTime,Duration,Watts1,Watts2,Watts3,WattsTotal");
       var rows = this.SensorDimTimes
       .Join(this.SensorEnergyLogs, time => time.Id, log => log.SensorDimTimeId, (time, log) => new { time, log })
-      .Where(row => row.time.SensorId == sensor.Id)
+      .Where(row => row.time.SensorId == sensor.Id && row.time.Year == year && row.time.Month == month)
       .Select(row => $"{row.time.Day},{row.time.Hour},{row.time.PeriodOfDay},{row.time.DayOfWeek},{row.log.UnixTime},{row.log.Duration},{row.log.Watts1},{row.log.Watts2},{row.log.Watts3},{row.log.WattsTotal}")
       .ToArray();
       foreach (var row in rows)
