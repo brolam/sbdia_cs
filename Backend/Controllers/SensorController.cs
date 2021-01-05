@@ -1,8 +1,8 @@
 ﻿
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Backend.Data;
 using Backend.Models;
@@ -64,7 +64,6 @@ namespace Backend.Controllers
       var sensor = this._dbContext.CreateSensor(userId, sensorItemDto);
       return CreatedAtAction(nameof(GetSensor), new { id = sensor.Id }, ToSensorItemDto(sensor));
     }
-
     private static SensorItemDto ToSensorItemDto(Sensor sensor)
     {
       return new SensorItemDto()
@@ -87,6 +86,24 @@ namespace Backend.Controllers
       {
         await this._dbContext.CreateSensorLogBatch(sensor, sensorLogBatch.Content);
         return new ObjectResult(null) { StatusCode = 201 };
+      }
+      return NotFound();
+    }
+
+    [HttpGet("{id}/logsToCsv/{year:int}/{month:int}/{secretApiToken}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetSensorLogsToCsv(string id, int year, int month, string secretApiToken)
+    {
+      var sensor = await this._dbContext.GetSensorAsync(id);
+      if (sensor == null) return NotFound();
+      var secretApiTokenValid = sensor.SecretApiToken.ToString();
+      if (secretApiTokenValid.Equals(secretApiToken))
+      {
+        var fileContent = this._dbContext.GetSensorEnergyLogsToCsv(sensor, year, month);
+        return File(Encoding.UTF8.GetBytes(
+          fileContent.ToString()),
+          "text/csv", $"{sensor.Name}-{year}-{month}.csv"
+          );
       }
       return NotFound();
     }

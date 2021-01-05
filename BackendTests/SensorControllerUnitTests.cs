@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Backend.Models.Dtos;
 using BackendTests.Mocks;
-using System.Collections.Generic;
+using System;
+using System.Text;
 
 namespace BackendTest
 {
@@ -145,6 +146,59 @@ namespace BackendTest
       var timeZones = Assert.IsType<string[]>(actionResult.Value);
       //Then
       Assert.NotEmpty(timeZones);
+    }
+
+    [Fact]
+    public async void GetSensorLogsToCsv()
+    {
+      //Given
+      var createSensor = this.CreateSensor();
+      var sensorDto = this.DbContext.GetSensorDto(createSensor.Id);
+      var log_at_15_20_00 = "1574608800;1;2;3";
+      var log_end_line = "|";
+      var log_at_15_20_15 = "1574608815;2;3;4";
+      var log_at_15_20_30 = "1574608830;2;3;4";
+      var sensorLogBatch = new SensorLogBatchDto()
+      {
+        SensorId = sensorDto.Id,
+        SecretApiToken = sensorDto.SecretApiToken,
+        Content = $"{log_at_15_20_00}{log_end_line}{log_at_15_20_15}{log_end_line}{log_at_15_20_30}"
+      };
+      //When
+      await this._controllerAllowAnonymous.PostSensorLogBatch(sensorLogBatch);
+      var sensor = await this.DbContext.GetSensorAsync(sensorDto.Id);
+      this.DbContext.PerformContentSensorLogBatch(sensor);
+      var result = await this._controllerAllowAnonymous.GetSensorLogsToCsv(sensorDto.Id, 2019, 11, sensorDto.SecretApiToken);
+      //Then
+      var resultValue = Assert.IsType<FileContentResult>(result);
+      Assert.NotEmpty(resultValue.FileContents);
+      var rows = Encoding.UTF8.GetString(resultValue.FileContents).Split(Environment.NewLine);
+      Assert.Equal("Day,Hour,PeriodOfDay,DayOfWeek,UnixTime,Duration,Watts1,Watts2,Watts3,WattsTotal", rows[0]);
+      Assert.Equal("24,15,Noon,Sunday,1574608800,14,26.378,52.756,79.134,158.268", rows[1]);
+      Assert.Equal("24,15,Noon,Sunday,1574608815,15,52.756,79.134,105.512,237.40201", rows[2]);
+      Assert.Equal("24,15,Noon,Sunday,1574608830,15,52.756,79.134,105.512,237.40201", rows[3]);
+    }
+
+    [Fact]
+    public async void GetSensorLogsToCsvNotFoundSensor()
+    {
+      //Given
+      var createSensor = this.CreateSensor();
+      //When
+      var result = await this._controllerAllowAnonymous.GetSensorLogsToCsv("INVALID ID", 2020, 1, createSensor.SecretApiToken);
+      //Then
+      Assert.IsType<NotFoundResult>(result);
+    }
+
+    [Fact]
+    public async void GetSensorLogsToCsvNotFoundSecretApiToken()
+    {
+      //Given
+      var createSensor = this.CreateSensor();
+      //When
+      var result = await this._controllerAllowAnonymous.GetSensorLogsToCsv(createSensor.Id, 2020, 1, "INVALID SecretApiToken");
+      //Then
+      Assert.IsType<NotFoundResult>(result);
     }
   }
 
