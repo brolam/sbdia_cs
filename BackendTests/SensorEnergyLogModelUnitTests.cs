@@ -3,6 +3,7 @@ using Backend.Models;
 using Backend.Models.Dtos;
 using BackendTests.Mocks;
 using System.Threading.Tasks;
+using System;
 
 namespace BackendTest
 {
@@ -207,6 +208,24 @@ namespace BackendTest
       var energyLogLast = this.DbContext.GetSensorEnergyLogLast(sensor);
       //Then
       Assert.Equal(1593584123, energyLogLast.UnixTime);
+    }
+    [Fact]
+    public async void GetSensorEnergyLogsToCsv()
+    {
+      //Given
+      var (sensor, sensorLogBatchsUnprocessed) = await this.CreateSensorLogBatchEnergyLogAsync
+      (
+        "1593584095;1;2;3|1593584123;1;2;3"
+      );
+      //When
+      this.DbContext.PerformContentSensorLogBatch(sensor);
+      var energyLogsToCsv = this.DbContext.GetSensorEnergyLogsToCsv(sensor, 2020, 7);
+      Assert.NotEmpty(energyLogsToCsv.ToString());
+      var rows = energyLogsToCsv.ToString().Split(Environment.NewLine);
+      //Then
+      Assert.Equal("Day,Hour,PeriodOfDay,DayOfWeek,UnixTime,Duration,Watts1,Watts2,Watts3,WattsTotal", rows[0]);
+      Assert.Equal("1,6,EarlyMorning,Wednesday,1593584095,14,26.378,52.756,79.134,158.268", rows[1]);
+      Assert.Equal("1,6,EarlyMorning,Wednesday,1593584123,14,26.378,52.756,79.134,158.268", rows[2]);
     }
   }
 }

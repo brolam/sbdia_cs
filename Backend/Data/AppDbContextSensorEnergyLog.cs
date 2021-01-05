@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace Backend.Data
 {
@@ -115,6 +116,21 @@ namespace Backend.Data
       .Where(log => log.SensorId == sensor.Id)
       .OrderByDescending(log => log.UnixTime)
       .FirstOrDefault();
+    }
+    public StringBuilder GetSensorEnergyLogsToCsv(Sensor sensor, int year, int month)
+    {
+      var builder = new StringBuilder();
+      builder.AppendLine("Day,Hour,PeriodOfDay,DayOfWeek,UnixTime,Duration,Watts1,Watts2,Watts3,WattsTotal");
+      var rows = this.SensorDimTimes
+      .Join(this.SensorEnergyLogs, time => time.Id, log => log.SensorDimTimeId, (time, log) => new { time, log })
+      .Where(row => row.time.SensorId == sensor.Id)
+      .Select(row => $"{row.time.Day},{row.time.Hour},{row.time.PeriodOfDay},{row.time.DayOfWeek},{row.log.UnixTime},{row.log.Duration},{row.log.Watts1},{row.log.Watts2},{row.log.Watts3},{row.log.WattsTotal}")
+      .ToArray();
+      foreach (var row in rows)
+      {
+        builder.AppendLine(row);
+      }
+      return builder;
     }
   }
 }
