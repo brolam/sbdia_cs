@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -90,9 +91,9 @@ namespace Backend.Controllers
       return NotFound();
     }
 
-    [HttpGet("{id}/logsToCsv/{year:int}/{month:int}/{secretApiToken}")]
+    [HttpGet("{id}/logsToCsv/{year:int}/{month:int}")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetSensorLogsToCsv(string id, int year, int month, string secretApiToken)
+    public async Task<IActionResult> GetSensorLogsToCsv(string id, int year, int month, [FromHeader(Name = "secretApiToken")][Required] string secretApiToken)
     {
       var sensor = await this._dbContext.GetSensorAsync(id);
       if (sensor == null) return NotFound();
