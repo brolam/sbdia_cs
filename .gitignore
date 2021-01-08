@@ -1,2 +1,4 @@
-Firmware/EnergyUseLoggerV2/OhaEsp8266/Config_dev.h
-Firmware/EnergyUseLoggerV2/OhaEsp8266/Config_dev.h
+*_dev.h
+*_dev.h
+*.secret
+*.csv
