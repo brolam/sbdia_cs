@@ -195,9 +195,17 @@ export class AuthorizeService {
         this.userManager = new UserManager(settings);
 
         this.userManager.events.addUserSignedOut(async () => {
-            await this.userManager.removeUser();
-            this.updateState(undefined);
+            await this.removeUser();
         });
+
+        this.userManager.events.addAccessTokenExpired(async () => {
+            await this.removeUser();
+        });
+    }
+
+    async removeUser() {
+        await this.userManager.removeUser();
+        this.updateState(undefined);
     }
 
     static get instance() { return authService }
