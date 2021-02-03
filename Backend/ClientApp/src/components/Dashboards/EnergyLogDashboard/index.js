@@ -24,12 +24,31 @@ export default function EnergyLogDashboard(props) {
   });
   var canvaChartRef = React.createRef();
 
+  function saveLastSensorIdSelected(sensorId) {
+    window.localStorage.setItem("EnergyLogDashboard.LastSensorIdSelected", sensorId);
+  }
+
+  function getLastSensorSelected(sensors) {
+    if (sensors.length == 0) return null;
+    var lastSensorId = window.localStorage.getItem("EnergyLogDashboard.LastSensorIdSelected");
+    if (!lastSensorId) return null;
+    for (const index in sensors) {
+      if (sensors[index].id == lastSensorId) return sensors[index];
+    }
+    return null;
+  }
+
   async function populateSensorsList() {
     const response = await fetch('api/sensor', {
       headers: !props.token ? {} : { 'Authorization': `Bearer ${props.token}` }
     });
     const sensors = await response.json();
-    setState({ ...state, sensors: sensors, loading: false });
+    const sensor = getLastSensorSelected(sensors);
+    console.log('sensor: ', sensor)
+    if (sensor)
+      setState({ ...state, sensors: sensors, selectedSensor: sensor, loading: true, dataRefresh: state.dataRefresh + 1 });
+    else
+      setState({ ...state, sensors: sensors, loading: false });
   }
 
   async function populateDashboardData(selectedSensor) {
@@ -88,6 +107,7 @@ export default function EnergyLogDashboard(props) {
 
   const onSelectedSensor = (sensor) => {
     setState({ ...state, selectedSensor: sensor, loading: true, dataRefresh: state.dataRefresh + 1 });
+    saveLastSensorIdSelected(sensor.id);
   }
 
   const onRefresh = (e) => {
