@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import DashboardToolbar from '../components/Toolbar'
 import Chart from "chart.js";
 var chartXy = null;
 export default function EnergyLogDashboard(props) {
@@ -137,6 +138,12 @@ export default function EnergyLogDashboard(props) {
 
   return (
     <main role="main" className="col-md-16 ml-sm-auto col-lg-12 px-md-4">
+      <DashboardToolbar
+        loading={state.loading}
+        selectedSensor={state.selectedSensor}
+        sensors={state.sensors}
+        onSelectedSensor={onSelectedSensor}
+      />
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <a className="dropdown">
           <h2 className="dropdown-toggle" to="#" id="dropdownSensors" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
