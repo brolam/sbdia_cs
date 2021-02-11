@@ -143,6 +143,9 @@ export default function EnergyLogDashboard(props) {
         selectedSensor={state.selectedSensor}
         sensors={state.sensors}
         onSelectedSensor={onSelectedSensor}
+        selectedDay={state.selectedXyDay}
+        days={state.data.xyDays}
+        onSelectedDay={onSelectedXyDay}
       />
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <a className="dropdown">
