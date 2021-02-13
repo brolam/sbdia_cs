@@ -146,61 +146,14 @@ export default function EnergyLogDashboard(props) {
         selectedDay={state.selectedXyDay}
         days={state.data.xyDays}
         onSelectedDay={onSelectedXyDay}
-      />
-      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <a className="dropdown">
-          <h2 className="dropdown-toggle" to="#" id="dropdownSensors" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {state.loading ?
-              "Dashboard loading" :
-              state.selectedSensor ?
-                state.selectedSensor.name :
-                "Select a Sensor"
-            }
-          </h2>
-          <ul className="dropdown-menu" aria-labelledby="dropdownSensors">
-            {
-              !state.loading && state.sensors.map(sensor =>
-                <li key={sensor.id} className="dropdown-item" onClick={(e) => { onSelectedSensor(sensor) }}>{sensor.name}</li>
-              )
-            }
-          </ul>
-        </a>
-        {(!state.loading && state.selectedSensor) &&
-          <div className="btn-toolbar mb-2 mb-md-0">
-            <div className="btn-group mr-2">
-              <button type="button" className={state.chartXyMetric == CHART_XY_KWH ? "btn btn-sm btn-outline-secondary active" : "btn btn-sm btn-outline-secondary"} onClick={(e) => onSelectedChartXyMetric(CHART_XY_KWH)}>
-                Kwh <span className="badge bg-secondary text-white">{state.data.totalKwh.toFixed(2)}</span>
-              </button>
-              <button type="button" className={state.chartXyMetric == CHART_XY_DURATION ? "btn btn-sm btn-outline-secondary active" : "btn btn-sm btn-outline-secondary"} onClick={(e) => onSelectedChartXyMetric(CHART_XY_DURATION)}>
-                Duration <span className="badge bg-secondary text-white">{state.data.totalDuration.toFixed(2)}</span>
-              </button>
-            </div>
-            <div className="row">
-              <div className="col">
-                <div className="dropdown">
-                  <button type="button" id="dropdownDays" className="btn btn-sm btn-outline-secondary dropdown-toggle" data-toggle="dropdown" >
-                    <span data-feather="calendar">
-                      {state.selectedXyDay.year}/{state.selectedXyDay.month}/{state.selectedXyDay.day}
-                    </span>
-                  </button>
-                  <ul className="dropdown-menu" aria-labelledby="dropdownDays">
-                    {
-                      !state.loading && state.data.xyDays.map(day =>
-                        <li key={day} className="dropdown-item" onClick={e => onSelectedXyDay(day)} >{day}</li>
-                      )
-                    }
-                  </ul>
-                </div>
-              </div>
-              <div className="col">
-                <button type="button" className="btn btn-sm btn-outline-secondary" onClick={(e) => onRefresh()}>
-                  <IconeReflesh />
-                </button>
-              </div>
-            </div>
-          </div>
+        chartMetrics={[
+          { key: CHART_XY_KWH, title: "Kwh", selected: state.chartXyMetric == CHART_XY_KWH, value: state.data.totalKwh.toFixed(2) },
+          { key: CHART_XY_DURATION, title: "Duration", selected: state.chartXyMetric == CHART_XY_DURATION, value: state.data.totalDuration.toFixed(2) }
+        ]
         }
-      </div>
+        onSelectedChartMetric={onSelectedChartXyMetric}
+        onRefresh={onRefresh}
+      />
       <canvas ref={canvaChartRef} className="my-4 w-100" id="myChart" width="1200" height="380"></canvas>
       <h2>Logs</h2>
       <div className="table-responsive">
