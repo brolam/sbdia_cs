@@ -1,7 +1,8 @@
-import React from 'react'
-import ButtonChartMetric from './ButtonChartMetric'
+import React from 'react';
+import ButtonChartMetric from './ButtonChartMetric';
 import DropdownSensors from './DropdownSensors';
-import DropdownDays from './DropdownDays'
+import DropdownDays from './DropdownDays';
+import ToolbarButtonIcon from './ToolbarButtonIcon';
 
 export default function Toolbar(props) {
   const {
@@ -17,7 +18,7 @@ export default function Toolbar(props) {
     onRefresh
   } = props;
 
-  const IconeReflesh = () => {
+  const IconReflesh = () => {
     return (
       <svg width="24" height="24" fill="currentColor" className="bi bi-arrow-clockwise" viewBox="0 0 16 16">
         <path fillRule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
@@ -26,7 +27,7 @@ export default function Toolbar(props) {
     )
   }
 
-  const IconeSettings = () => {
+  const IconSettings = () => {
     return (
       <svg width="24" height="24" fill="currentColor" className="bi bi-gear" viewBox="0 0 16 16">
         <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z" />
@@ -59,16 +60,8 @@ export default function Toolbar(props) {
             onClick={() => onSelectedChartMetric(metric.key)}
           />
         )}
-        <li className="nav-item">
-          <a className="nav-link" to="#" role="button" onClick={(e) => onRefresh()}>
-            <IconeReflesh />
-          </a>
-        </li>
-        <li className="nav-item">
-          <a className="nav-link" to="#" role="button" onClick={(e) => onRefresh()}>
-            <IconeSettings />
-          </a>
-        </li>
+        <ToolbarButtonIcon icon={IconReflesh} onClick={onRefresh} />
+        <ToolbarButtonIcon icon={IconSettings} onClick={onRefresh} />
       </ul>
     </div>
   )
