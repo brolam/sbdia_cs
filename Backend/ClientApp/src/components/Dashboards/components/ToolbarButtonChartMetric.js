@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function ButtonChartMetric(props) {
+export default function ToolbarButtonChartMetric(props) {
   const { title, selected, value, onClick } = props;
   return (
     <li class="nav-item">

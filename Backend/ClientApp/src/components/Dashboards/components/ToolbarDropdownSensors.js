@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function DropdownSensors(props) {
+export default function ToolbarDropdownSensors(props) {
   const { loading, selectedSensor, sensors, onSelectedSensor } = props;
   return (
     <li className="nav-item dropdown">

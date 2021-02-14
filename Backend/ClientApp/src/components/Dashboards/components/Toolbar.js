@@ -1,7 +1,7 @@
 import React from 'react';
-import ButtonChartMetric from './ButtonChartMetric';
-import DropdownSensors from './DropdownSensors';
-import DropdownDays from './DropdownDays';
+import ButtonChartMetric from './ToolbarButtonChartMetric';
+import DropdownSensors from './ToolbarDropdownSensors';
+import DropdownDays from './ToolbarDropdownDays';
 import ToolbarButtonIcon from './ToolbarButtonIcon';
 
 export default function Toolbar(props) {

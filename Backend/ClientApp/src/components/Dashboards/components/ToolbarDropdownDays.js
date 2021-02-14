@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function DropdownDays(props) {
+export default function ToolbarDropdownDays(props) {
   const { loading, selectedDay, days, onSelectedDay } = props;
   return (
     <li className="nav-item dropdown">
