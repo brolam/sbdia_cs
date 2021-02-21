@@ -44,7 +44,7 @@ test("render sensor menu user authenticated", async () => {
 
   expect(pretty(container.innerHTML)).toMatchInlineSnapshot(`
     "<li class=\\"nav-item dropdown\\"><a class=\\"nav-link dropdown-toggle\\" id=\\"navbarDropdown\\" role=\\"button\\" data-toggle=\\"dropdown\\" aria-haspopup=\\"true\\" aria-expanded=\\"false\\" href=\\"/\\">Sensores</a>
-      <div class=\\"dropdown-menu\\" aria-labelledby=\\"navbarDropdown\\"><a class=\\"dropdown-item\\" href=\\"/sensors\\">List</a><a class=\\"dropdown-item\\" href=\\"/sensors\\">New</a></div>
+      <div class=\\"dropdown-menu\\" aria-labelledby=\\"navbarDropdown\\"><a class=\\"dropdown-item\\" href=\\"/sensors\\">List</a><a class=\\"dropdown-item\\" href=\\"/sensors/new\\">New</a></div>
     </li>"
   `);
 });
