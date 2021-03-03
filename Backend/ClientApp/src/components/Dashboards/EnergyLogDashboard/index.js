@@ -30,11 +30,11 @@ export default function EnergyLogDashboard(props) {
   }
 
   function getLastSensorSelected(sensors) {
-    if (sensors.length == 0) return null;
+    if (sensors.lengths === 0) return null;
     var lastSensorId = window.localStorage.getItem("EnergyLogDashboard.LastSensorIdSelected");
     if (!lastSensorId) return null;
     for (const index in sensors) {
-      if (sensors[index].id == lastSensorId) return sensors[index];
+      if (sensors[index].id === lastSensorId) return sensors[index];
     }
     return null;
   }
@@ -61,8 +61,8 @@ export default function EnergyLogDashboard(props) {
     });
     const data = await response.json();
     var totalKwh = 0.00, totalDuration = 0.00;
-    data.xyTotalKwh.map(xy => { totalKwh += xy.y })
-    data.xyTotalDuration.map(xy => { totalDuration += xy.y })
+    data.xyTotalKwh.map(xy => (totalKwh += xy.y))
+    data.xyTotalDuration.map(xy => (totalDuration += xy.y))
     setState({ ...state, data: { ...data, totalKwh, totalDuration }, loading: false });
   }
 
@@ -97,7 +97,7 @@ export default function EnergyLogDashboard(props) {
     })
   }, []);
   useEffect(() => {
-    var [x, y] = state.chartXyMetric == CHART_XY_KWH ?
+    var [x, y] = state.chartXyMetric === CHART_XY_KWH ?
       [state.data.xyTotalKwh.map(xy => xy.x), state.data.xyTotalKwh.map(xy => xy.y)]
       :
       [state.data.xyTotalDuration.map(xy => xy.x), state.data.xyTotalDuration.map(xy => xy.y)]
@@ -138,8 +138,8 @@ export default function EnergyLogDashboard(props) {
         days={state.data.xyDays}
         onSelectedDay={onSelectedXyDay}
         chartMetrics={[
-          { key: CHART_XY_KWH, title: "Kwh", selected: state.chartXyMetric == CHART_XY_KWH, value: state.data.totalKwh.toFixed(2) },
-          { key: CHART_XY_DURATION, title: "Duration", selected: state.chartXyMetric == CHART_XY_DURATION, value: state.data.totalDuration.toFixed(2) }
+          { key: CHART_XY_KWH, title: "Kwh", selected: state.chartXyMetric === CHART_XY_KWH, value: state.data.totalKwh.toFixed(2) },
+          { key: CHART_XY_DURATION, title: "Duration", selected: state.chartXyMetric === CHART_XY_DURATION, value: state.data.totalDuration.toFixed(2) }
         ]
         }
         onSelectedChartMetric={onSelectedChartXyMetric}

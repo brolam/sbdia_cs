@@ -3,16 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "bootstrap": "^4.5.2",
+    "bootstrap": "^4.6.0",
     "chart.js": "^2.9.4",
     "jquery": "^3.5.1",
     "merge": "^1.2.1",
-    "oidc-client": "^1.10.1",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "oidc-client": "^1.11.5",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
     "react-router-bootstrap": "^0.24.4",
-    "react-router-dom": "^4.2.2",
-    "react-scripts": "^3.4.3",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "^3.4.4",
     "reactstrap": "^6.3.0",
     "rimraf": "^2.7.1"
   },
@@ -23,11 +23,11 @@
     "eslint-config-react-app": "^4.0.1",
     "eslint-plugin-flowtype": "^2.0.0",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-react": "^7.21.4",
-    "prettier": "^2.1.2",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.22.0",
+    "prettier": "^2.2.1",
     "pretty": "^2.0.0",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.9"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -38,7 +38,8 @@
     "test": "cross-env CI=true react-scripts test --env=jsdom",
     "test-u": "cross-env CI=true react-scripts test --env=jsdom -u",
     "eject": "react-scripts eject",
-    "lint": "eslint ./src/"
+    "lint": "eslint ./src/",
+    "test-coverage": "react-scripts test --env=jsdom --coverage"
   },
   "browserslist": {
     "production": [
