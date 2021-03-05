@@ -4,7 +4,7 @@ export default function ToolbarDropdownDays(props) {
   const { loading, selectedDay, days, onSelectedDay } = props;
   return (
     <li className="nav-item dropdown">
-      <a className="nav-link">
+      <div className="nav-link">
         <h4 className="dropdown-toggle" to="#" id="dropdownDays" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           {selectedDay.year}/{selectedDay.month}/{selectedDay.day}
         </h4>
@@ -15,7 +15,7 @@ export default function ToolbarDropdownDays(props) {
             )
           }
         </ul>
-      </a>
+      </div>
     </li>
   )
 }

@@ -4,7 +4,7 @@ export default function ToolbarDropdownSensors(props) {
   const { loading, selectedSensor, sensors, onSelectedSensor } = props;
   return (
     <li className="nav-item dropdown">
-      <a className="nav-link">
+      <div className="nav-link">
         <h4 className="dropdown-toggle" to="#" id="dropdownSensors" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           {loading ?
             "Dashboard loading" :
@@ -16,7 +16,7 @@ export default function ToolbarDropdownSensors(props) {
           {!loading && sensors.map(sensor => <li key={sensor.id} className="dropdown-item" onClick={(e) => { onSelectedSensor(sensor); }}>{sensor.name}</li>
           )}
         </ul>
-      </a>
+      </div>
     </li>
   )
 }

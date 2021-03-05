@@ -6,13 +6,6 @@ export default function SensorNew(props) {
     loading: true
   });
 
-  async function populateTimeZones() {
-    const response = await fetch('api/sensor/timeZones', {
-      headers: !props.token ? {} : { 'Authorization': `Bearer ${props.token}` }
-    });
-    const timeZones = await response.json();
-    setState({ ...state, timeZones: timeZones, loading: false });
-  }
   const onSubmit = (e) => {
     e.preventDefault();
     var sensorName = e.target.elements.name.value;
@@ -32,7 +25,16 @@ export default function SensorNew(props) {
     return false;
   }
 
-  useEffect(() => { populateTimeZones(); }, [props.token]);
+  useEffect(() => {
+    async function populateTimeZones() {
+      const response = await fetch('api/sensor/timeZones', {
+        headers: !props.token ? {} : { 'Authorization': `Bearer ${props.token}` }
+      });
+      const timeZones = await response.json();
+      setState({ ...state, timeZones: timeZones, loading: false });
+    }
+    populateTimeZones();
+  }, [props.token, state]);
 
   return (
     <form onSubmit={onSubmit}  >

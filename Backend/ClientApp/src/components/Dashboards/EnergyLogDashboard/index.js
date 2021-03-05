@@ -6,23 +6,20 @@ export default function EnergyLogDashboard(props) {
 
   const [CHART_XY_KWH, CHART_XY_DURATION] = ["CHART_XY_KWH", "CHART_XY_DURATION"];
   const toDay = new Date();
-  const [dafaultYear, dafaultMonth, defautlDay] = [toDay.getFullYear(), toDay.getMonth() + 1, toDay.getDate()]
-  const [state, setState] = useState({
-    sensors: [],
-    loading: true,
-    selectedSensor: null,
-    selectedXyDay: { year: dafaultYear, month: dafaultMonth, day: defautlDay },
-    data: {
-      xyTotalKwh: [],
-      xyTotalDuration: [],
-      xyDays: [],
-      logsRecent: [],
-      totalKwh: 0.00,
-      totalDuration: 0.00
-    },
-    chartXyMetric: CHART_XY_KWH,
-    dataRefresh: 0
+  const [dafaultYear, dafaultMonth, defautlDay] = [toDay.getFullYear(), toDay.getMonth() + 1, toDay.getDate()];
+  const [stateLoading, setStateLoading] = useState(true);
+  const [stateSensors, setStateSensors] = useState({ sensors: [], selectedSensor: null });
+  const [stateXy, setStateXy] = useState({
+    xyTotalKwh: [],
+    xyTotalDuration: [],
+    xyDays: [],
+    logsRecent: [],
+    totalKwh: 0.00,
+    totalDuration: 0.00
   });
+  const [stateSelectedXyDay, setStateSelectedXyDay] = useState({ year: dafaultYear, month: dafaultMonth, day: defautlDay });
+  const [stateChartXyMetric, setStateChartXyMetric] = useState(CHART_XY_KWH);
+  const [stateRefresh, setStateRefresh] = useState(0);
   var canvaChartRef = React.createRef();
 
   function saveLastSensorIdSelected(sensorId) {
@@ -39,35 +36,37 @@ export default function EnergyLogDashboard(props) {
     return null;
   }
 
-  async function populateSensorsList() {
-    const response = await fetch('api/sensor', {
-      headers: !props.token ? {} : { 'Authorization': `Bearer ${props.token}` }
-    });
-    const sensors = await response.json();
-    const sensor = getLastSensorSelected(sensors);
-    console.log('sensor: ', sensor)
-    if (sensor)
-      setState({ ...state, sensors: sensors, selectedSensor: sensor, loading: true, dataRefresh: state.dataRefresh + 1 });
-    else
-      setState({ ...state, sensors: sensors, loading: false });
-  }
+  useEffect(() => {
+    async function populateSensorsList() {
+      const response = await fetch('api/sensor', {
+        headers: !props.token ? {} : { 'Authorization': `Bearer ${props.token}` }
+      });
+      const sensors = await response.json();
+      const selectedSensor = getLastSensorSelected(sensors);
+      setStateSensors({ sensors: sensors, selectedSensor: selectedSensor });
+      setStateLoading(false);
+    }
+    populateSensorsList();
+  }, [props.token]);
 
-  async function populateDashboardData(selectedSensor) {
-    if (!selectedSensor) return false;
-    const sensorId = selectedSensor.id;
-    const { year, month, day } = state.selectedXyDay;
-    const response = await fetch(`api/sensor/${sensorId}/dashboard/${year}/${month}/${day}`, {
-      headers: !props.token ? {} : { 'Authorization': `Bearer ${props.token}` }
-    });
-    const data = await response.json();
-    var totalKwh = 0.00, totalDuration = 0.00;
-    data.xyTotalKwh.map(xy => (totalKwh += xy.y))
-    data.xyTotalDuration.map(xy => (totalDuration += xy.y))
-    setState({ ...state, data: { ...data, totalKwh, totalDuration }, loading: false });
-  }
+  useEffect(() => {
+    async function populateDashboardData(selectedSensor) {
+      if (!selectedSensor) return false;
+      const sensorId = selectedSensor.id;
+      const { year, month, day } = stateSelectedXyDay;
+      const response = await fetch(`api/sensor/${sensorId}/dashboard/${year}/${month}/${day}`, {
+        headers: !props.token ? {} : { 'Authorization': `Bearer ${props.token}` }
+      });
+      const data = await response.json();
+      var totalKwh = 0.00, totalDuration = 0.00;
+      data.xyTotalKwh.map(xy => (totalKwh += xy.y))
+      data.xyTotalDuration.map(xy => (totalDuration += xy.y))
+      setStateXy({ ...data, totalKwh, totalDuration });
+      setStateLoading(false);
+    }
+    populateDashboardData(stateSensors.selectedSensor);
+  }, [props.token, stateSensors, stateSelectedXyDay, stateRefresh]);
 
-  useEffect(() => { populateSensorsList(); }, [props.token]);
-  useEffect(() => { populateDashboardData(state.selectedSensor); }, [state.dataRefresh]);
   useEffect(() => {
     chartXy = new Chart(canvaChartRef.current, {
       type: 'line',
@@ -95,51 +94,54 @@ export default function EnergyLogDashboard(props) {
         }
       }
     })
-  }, []);
+  }, [canvaChartRef]);
+
   useEffect(() => {
-    var [x, y] = state.chartXyMetric === CHART_XY_KWH ?
-      [state.data.xyTotalKwh.map(xy => xy.x), state.data.xyTotalKwh.map(xy => xy.y)]
+    var [x, y] = stateChartXyMetric === CHART_XY_KWH ?
+      [stateXy.xyTotalKwh.map(xy => xy.x), stateXy.xyTotalKwh.map(xy => xy.y)]
       :
-      [state.data.xyTotalDuration.map(xy => xy.x), state.data.xyTotalDuration.map(xy => xy.y)]
+      [stateXy.xyTotalDuration.map(xy => xy.x), stateXy.xyTotalDuration.map(xy => xy.y)]
     chartXy.data.labels = x;
     chartXy.data.datasets[0].data = y;
     chartXy.update();
-  }, [state.data, state.chartXyMetric]);
+  }, [stateXy, stateChartXyMetric, CHART_XY_KWH, stateLoading]);
 
   const onSelectedSensor = (sensor) => {
-    setState({ ...state, selectedSensor: sensor, loading: true, dataRefresh: state.dataRefresh + 1 });
+    setStateSensors({ ...stateSensors, selectedSensor: sensor });
     saveLastSensorIdSelected(sensor.id);
   }
 
   const onRefresh = (e) => {
-    if (state.loading) return;
-    setState({ ...state, loading: true, dataRefresh: state.dataRefresh + 1 });
+    if (stateLoading) return;
+    setStateRefresh(stateRefresh + 1);
+    setStateLoading(true);
   }
 
   const onSelectedChartXyMetric = (metric) => {
-    if (state.loading) return;
-    setState({ ...state, chartXyMetric: metric });
+    if (stateLoading) return;
+    setStateChartXyMetric(metric);
   }
 
   const onSelectedXyDay = (selectedDay) => {
-    if (state.loading) return;
+    if (stateLoading) return;
     const [year, month, day] = selectedDay.split("/");
-    setState({ ...state, loading: true, selectedXyDay: { year, month, day }, dataRefresh: state.dataRefresh + 1 });
+    setStateSelectedXyDay({ year, month, day });
+    setStateLoading(true);
   }
 
   return (
     <main role="main" className="col-md-16 ml-sm-auto col-lg-12 px-md-4">
       <DashboardToolbar
-        loading={state.loading}
-        selectedSensor={state.selectedSensor}
-        sensors={state.sensors}
+        loading={stateLoading}
+        selectedSensor={stateSensors.selectedSensor}
+        sensors={stateSensors.sensors}
         onSelectedSensor={onSelectedSensor}
-        selectedDay={state.selectedXyDay}
-        days={state.data.xyDays}
+        selectedDay={stateSelectedXyDay}
+        days={stateXy.xyDays}
         onSelectedDay={onSelectedXyDay}
         chartMetrics={[
-          { key: CHART_XY_KWH, title: "Kwh", selected: state.chartXyMetric === CHART_XY_KWH, value: state.data.totalKwh.toFixed(2) },
-          { key: CHART_XY_DURATION, title: "Duration", selected: state.chartXyMetric === CHART_XY_DURATION, value: state.data.totalDuration.toFixed(2) }
+          { key: CHART_XY_KWH, title: "Kwh", selected: stateChartXyMetric === CHART_XY_KWH, value: stateXy.totalKwh.toFixed(2) },
+          { key: CHART_XY_DURATION, title: "Duration", selected: stateChartXyMetric === CHART_XY_DURATION, value: stateXy.totalDuration.toFixed(2) }
         ]
         }
         onSelectedChartMetric={onSelectedChartXyMetric}
@@ -160,7 +162,7 @@ export default function EnergyLogDashboard(props) {
             </tr>
           </thead>
           <tbody>
-            {state.data.logsRecent && state.data.logsRecent.map((log) => (
+            {stateXy.logsRecent && stateXy.logsRecent.map((log) => (
               <tr key={log.id}>
                 <td>{(new Date(log.dateTime)).toLocaleString()}</td>
                 <td className="text-center">{log.duration}</td>
