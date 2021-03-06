@@ -32,5 +32,10 @@ namespace Backend.Models
       TimeZoneInfo sensorTimeZone = TimeZoneInfo.FindSystemTimeZoneById(this.TimeZone);
       return TimeZoneInfo.ConvertTimeFromUtc(dtUnixTime, sensorTimeZone);
     }
+    public long GetUnixTimeUtc()
+    {
+      var timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
+      return (long)timeSpan.TotalSeconds;
+    }
   }
 }

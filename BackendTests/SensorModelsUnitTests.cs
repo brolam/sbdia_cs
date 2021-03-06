@@ -143,5 +143,20 @@ namespace BackendTest
       //Then
       Assert.Empty(sensorWithoutLogBatchPending);
     }
+
+    [Fact]
+    public async void GetSensorUnixTimeUtc()
+    {
+      //Given
+      var sensor = await CreateSensorAsync("UserWithSensor@sbdia.iot", "My Sensor", SensorTypes.EnergyLog);
+      var sensorUnixTimeUtc = sensor.GetUnixTimeUtc();
+      //When
+      sensor.TimeZone = "America/Recife";
+      var sensorDateTimeSensorTimeZone = sensor.ToDateTimeSensorTimeZone(sensorUnixTimeUtc);
+      var sensorUnixTimeZone = (long)(sensorDateTimeSensorTimeZone - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
+      var diffInHours = (sensorUnixTimeUtc - sensorUnixTimeZone) / 3600;
+      //Then
+      Assert.Equal(3, diffInHours);
+    }
   }
 }
