@@ -200,6 +200,30 @@ namespace BackendTest
       //Then
       Assert.IsType<NotFoundResult>(result);
     }
+    [Fact]
+    public async void GetSensorUnixTimeUtc()
+    {
+      //Given
+      var createSensor = this.CreateSensor();
+      var sensorId = createSensor.Id;
+      var secretApiToken = createSensor.SecretApiToken;
+      //When
+      var result = await this._controllerAllowAnonymous.GetSensorUnixTimeUtc(sensorId, secretApiToken);
+      var resultValue = Assert.IsType<ContentResult>(((ContentResult)result));
+      //Then
+      Assert.NotNull(resultValue);
+    }
+    [Fact]
+    public async void GetSensorUnixTimeUtcNotFoundSecretApiToken()
+    {
+      //Given
+      var createSensor = this.CreateSensor();
+      var sensorId = createSensor.Id;
+      var secretApiTokenInvalid = "secretApiTokenInvalid";
+      //When
+      var result = await this._controllerAllowAnonymous.GetSensorUnixTimeUtc(sensorId, secretApiTokenInvalid);
+      //Then
+      Assert.IsType<NotFoundResult>(result);
+    }
   }
-
 }

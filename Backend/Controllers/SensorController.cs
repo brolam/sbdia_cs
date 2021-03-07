@@ -108,5 +108,19 @@ namespace Backend.Controllers
       }
       return NotFound();
     }
+
+    [HttpGet("{id}/unixTimeUtc")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetSensorUnixTimeUtc(string id, [FromHeader(Name = "secretApiToken")][Required] string secretApiToken)
+    {
+      var sensor = await this._dbContext.GetSensorAsync(id);
+      if (sensor == null) return NotFound();
+      var secretApiTokenValid = sensor.SecretApiToken.ToString();
+      if (secretApiTokenValid.Equals(secretApiToken))
+      {
+        return Content(sensor.GetUnixTimeUtc().ToString(), "text/plain");
+      }
+      return NotFound();
+    }
   }
 }
