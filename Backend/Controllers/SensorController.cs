@@ -76,16 +76,20 @@ namespace Backend.Controllers
       };
     }
 
-    [HttpPost("logBatch")]
+    [HttpPost("{id}/logBatch")]
     [AllowAnonymous]
-    public async Task<IActionResult> PostSensorLogBatch(SensorLogBatchDto sensorLogBatch)
+    public async Task<IActionResult> PostSensorLogBatch(
+      string id,
+      [FromHeader(Name = "secretApiToken")][Required] string secretApiToken,
+      [FromBody][Required] string content
+    )
     {
-      var sensor = await this._dbContext.GetSensorAsync(sensorLogBatch.SensorId);
+      var sensor = await this._dbContext.GetSensorAsync(id);
       if (sensor == null) return NotFound();
       var secretApiTokenValid = sensor.SecretApiToken.ToString();
-      if (sensorLogBatch.SecretApiToken.Equals(secretApiTokenValid))
+      if (secretApiTokenValid.Equals(secretApiToken))
       {
-        await this._dbContext.CreateSensorLogBatch(sensor, sensorLogBatch.Content);
+        await this._dbContext.CreateSensorLogBatch(sensor, content);
         return new ObjectResult(null) { StatusCode = 201 };
       }
       return NotFound();

@@ -71,22 +71,22 @@ namespace BackendTest
       var log_end_line = "|";
       var log_at_15_20_15 = "1574608815;2;3;4";
       var log_at_15_20_30 = "1574608830;2;3;4";
-      var sensorLogBatch = new SensorLogBatchDto()
-      {
-        SensorId = sensorDto.Id,
-        SecretApiToken = sensorDto.SecretApiToken,
-        Content = $"{log_at_15_20_00}{log_end_line}{log_at_15_20_15}{log_end_line}{log_at_15_20_30}"
-      };
-
+      var sensorId = sensorDto.Id;
+      var secretApiToken = sensorDto.SecretApiToken;
+      var content = $"{log_at_15_20_00}{log_end_line}{log_at_15_20_15}{log_end_line}{log_at_15_20_30}";
       //When
-      var result = await this._controllerAllowAnonymous.PostSensorLogBatch(sensorLogBatch);
+      var result = await this._controllerAllowAnonymous.PostSensorLogBatch(
+        sensorId,
+        secretApiToken,
+        content
+      );
       var resultValue = Assert.IsType<ObjectResult>(((ObjectResult)result));
       var sensorLogBatchs = this.DbContext.GetSensorLogBatchPending(sensorDto.Id);
 
       //Then
       Assert.Equal(201, resultValue.StatusCode);
       Assert.NotEmpty(sensorLogBatchs);
-      Assert.Equal(sensorLogBatch.Content, sensorLogBatchs[0].Content);
+      Assert.Equal(content, sensorLogBatchs[0].Content);
     }
 
     [Fact]
@@ -97,17 +97,15 @@ namespace BackendTest
       var sensorDto = this.DbContext.GetSensorDto(createSensor.Id);
       var log_at_15_20_00 = "1574608800;1;2;3";
       var sensorIdInvalid = "bd6cb0ca-24a1-4064-97f8-b95f3cfeb1cf";
-      var logBatchSensorIdInvalid = new SensorLogBatchDto()
-      {
-        SensorId = sensorIdInvalid,
-        SecretApiToken = sensorDto.SecretApiToken,
-        Content = $"{log_at_15_20_00}"
-      };
-
+      var sensorId = sensorIdInvalid;
+      var secretApiToken = sensorDto.SecretApiToken;
+      var content = $"{log_at_15_20_00}";
       //When
       var result = await this._controllerAllowAnonymous.PostSensorLogBatch
       (
-          logBatchSensorIdInvalid
+          sensorId,
+          secretApiToken,
+          content
       );
 
       //Then
@@ -121,17 +119,15 @@ namespace BackendTest
       var createSensor = this.CreateSensor();
       var sensorDto = this.DbContext.GetSensorDto(createSensor.Id);
       var log_at_15_20_00 = "1574608800;1;2;3";
-      var SecretApiTokenInvalid = "bd6cb0ca-24a1-4064-97f8-b95f3cfeb1cf";
-      var logBatchSecretApiTokenInvalid = new SensorLogBatchDto()
-      {
-        SensorId = sensorDto.Id,
-        SecretApiToken = SecretApiTokenInvalid,
-        Content = $"{log_at_15_20_00}"
-      };
+      var sensorId = sensorDto.Id;
+      var secretApiTokenInvalid = "bd6cb0ca-24a1-4064-97f8-b95f3cfeb1cf";
+      var content = $"{log_at_15_20_00}";
       //When
       var result = await this._controllerAllowAnonymous.PostSensorLogBatch
       (
-          logBatchSecretApiTokenInvalid
+          sensorId,
+          secretApiTokenInvalid,
+          content
       );
       //Then
       Assert.IsType<NotFoundResult>(result);
@@ -158,14 +154,15 @@ namespace BackendTest
       var log_end_line = "|";
       var log_at_15_20_15 = "1574608815;2;3;4";
       var log_at_15_20_30 = "1574608830;2;3;4";
-      var sensorLogBatch = new SensorLogBatchDto()
-      {
-        SensorId = sensorDto.Id,
-        SecretApiToken = sensorDto.SecretApiToken,
-        Content = $"{log_at_15_20_00}{log_end_line}{log_at_15_20_15}{log_end_line}{log_at_15_20_30}"
-      };
+      var sensorId = sensorDto.Id;
+      var secretApiToken = sensorDto.SecretApiToken;
+      var content = $"{log_at_15_20_00}{log_end_line}{log_at_15_20_15}{log_end_line}{log_at_15_20_30}";
       //When
-      await this._controllerAllowAnonymous.PostSensorLogBatch(sensorLogBatch);
+      await this._controllerAllowAnonymous.PostSensorLogBatch(
+        sensorId,
+        secretApiToken,
+        content
+      );
       var sensor = await this.DbContext.GetSensorAsync(sensorDto.Id);
       this.DbContext.PerformContentSensorLogBatch(sensor);
       var result = await this._controllerAllowAnonymous.GetSensorLogsToCsv(sensorDto.Id, 2019, 11, sensorDto.SecretApiToken);
