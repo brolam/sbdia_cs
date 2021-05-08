@@ -68,7 +68,8 @@ export default function EnergyLogDashboard(props) {
   }, [props.token, stateSensors, stateSelectedXyDay, stateRefresh]);
 
   useEffect(() => {
-    chartXy = new Chart(canvaChartRef.current, {
+    if (chartXy) return;
+    chartXy = new Chart(canvaChartRef.current.getContext('2d'), {
       type: 'line',
       data: {
         labels: [],
@@ -97,6 +98,7 @@ export default function EnergyLogDashboard(props) {
   }, [canvaChartRef]);
 
   useEffect(() => {
+    chartXy.clear();
     var [x, y] = stateChartXyMetric === CHART_XY_KWH ?
       [stateXy.xyTotalKwh.map(xy => xy.x), stateXy.xyTotalKwh.map(xy => xy.y)]
       :

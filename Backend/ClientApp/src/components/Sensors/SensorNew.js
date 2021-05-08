@@ -39,12 +39,12 @@ export default function SensorNew(props) {
   return (
     <form onSubmit={onSubmit}  >
       <div className="form-group">
-        <label for="sensorNameInput">Name</label>
+        <label htmlFor="sensorNameInput">Name</label>
         <input name="name" type="text" className="form-control" id="sensorNameInput" aria-describedby="sensorNameHelp" placeholder="Enter sensor name" />
         <small id="sensorNameHelp" className="form-text text-muted">Sensor name is required.</small>
       </div>
       <div className="form-group">
-        <label for="sensorTimeZone">Select a Time Zone</label>
+        <label htmlFor="sensorTimeZone">Select a Time Zone</label>
         <select name="timeZone" className="form-control" id="sensorTimeZone">
           {
             state.timeZones.map(timeZone =>
@@ -56,4 +56,4 @@ export default function SensorNew(props) {
       {!state.loading && <button className="btn btn-primary" >Submit</button>}
     </form>
   )
-} 
+}
