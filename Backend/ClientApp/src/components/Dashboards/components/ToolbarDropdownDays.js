@@ -10,7 +10,7 @@ export default function ToolbarDropdownDays(props) {
         </h4>
         <ul className="dropdown-menu" aria-labelledby="dropdownDays">
           {
-            !loading && days.map(day =>
+            !loading && days.reverse().map(day =>
               <li key={day} className="dropdown-item" onClick={e => onSelectedDay(day)} >{day}</li>
             )
           }

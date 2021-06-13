@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using System.Globalization;
 
 namespace Backend.Data
 {
@@ -120,11 +121,14 @@ namespace Backend.Data
     public StringBuilder GetSensorEnergyLogsToCsv(Sensor sensor, int year, int month)
     {
       var builder = new StringBuilder();
+      var nf = new NumberFormatInfo();
+      nf.NumberDecimalSeparator = ".";
+      nf.NumberGroupSeparator = "";
       builder.AppendLine("Day,Hour,PeriodOfDay,DayOfWeek,UnixTime,Duration,Watts1,Watts2,Watts3,WattsTotal");
       var rows = this.SensorDimTimes
       .Join(this.SensorEnergyLogs, time => time.Id, log => log.SensorDimTimeId, (time, log) => new { time, log })
       .Where(row => row.time.SensorId == sensor.Id && row.time.Year == year && row.time.Month == month)
-      .Select(row => $"{row.time.Day},{row.time.Hour},{row.time.PeriodOfDay},{row.time.DayOfWeek},{row.log.UnixTime},{row.log.Duration},{row.log.Watts1},{row.log.Watts2},{row.log.Watts3},{row.log.WattsTotal}")
+      .Select(row => $"{row.time.Day},{row.time.Hour},{row.time.PeriodOfDay},{row.time.DayOfWeek},{row.log.UnixTime},{row.log.Duration},{row.log.Watts1.ToString(nf)},{row.log.Watts2.ToString(nf)},{row.log.Watts3.ToString(nf)},{row.log.WattsTotal.ToString(nf)}")
       .ToArray();
       foreach (var row in rows)
       {

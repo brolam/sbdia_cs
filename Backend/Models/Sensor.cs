@@ -18,7 +18,7 @@ namespace Backend.Models
     [Required, MaxLength(50)]
     public string Name { get; set; }
     [Required, MaxLength(200)]
-    public string TimeZone { get; set; } = System.TimeZoneInfo.Local.Id;
+    public string TimeZone { get; set; } = TimeZoneInfo.Utc.Id;
     [Required]
     public float DefaultToConvert { get; set; } = 26.378f;
     [Required]

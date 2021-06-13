@@ -171,9 +171,9 @@ namespace BackendTest
       Assert.NotEmpty(resultValue.FileContents);
       var rows = Encoding.UTF8.GetString(resultValue.FileContents).Split(Environment.NewLine);
       Assert.Equal("Day,Hour,PeriodOfDay,DayOfWeek,UnixTime,Duration,Watts1,Watts2,Watts3,WattsTotal", rows[0]);
-      Assert.Equal("24,15,Noon,Sunday,1574608800,14,26.378,52.756,79.134,158.268", rows[1]);
-      Assert.Equal("24,15,Noon,Sunday,1574608815,15,52.756,79.134,105.512,237.40201", rows[2]);
-      Assert.Equal("24,15,Noon,Sunday,1574608830,15,52.756,79.134,105.512,237.40201", rows[3]);
+      Assert.Equal("24,12,Morning,Sunday,1574608800,14,26.378,52.756,79.134,158.268", rows[1]);
+      Assert.Equal("24,12,Morning,Sunday,1574608815,15,52.756,79.134,105.512,237.40201", rows[2]);
+      Assert.Equal("24,12,Morning,Sunday,1574608830,15,52.756,79.134,105.512,237.40201", rows[3]);
     }
 
     [Fact]
