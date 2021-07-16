@@ -11,7 +11,6 @@ export default function Toolbar(props) {
     sensors,
     onSelectedSensor,
     selectedDay,
-    days,
     onSelectedDay,
     chartMetrics,
     onSelectedChartMetric,
@@ -48,7 +47,6 @@ export default function Toolbar(props) {
         <DropdownDays
           loading={loading}
           selectedDay={selectedDay}
-          days={days}
           onSelectedDay={onSelectedDay}
         />
         {chartMetrics.map(metric =>
@@ -65,4 +63,4 @@ export default function Toolbar(props) {
       </ul>
     </div>
   )
-}   
+}

@@ -66,13 +66,5 @@ namespace Backend.Data
       }
       throw new NotImplementedException();
     }
-    public Task<string[]> GetSensorXyDaysAsync(Sensor sensor)
-    {
-      var days = this.SensorDimTimes
-      .Where(sensorDimTimes => sensorDimTimes.SensorId == sensor.Id)
-      .Select(sensorDimTime => $"{sensorDimTime.Year}/{sensorDimTime.Month:00}/{sensorDimTime.Day:00}")
-      .Distinct();
-      return days.ToArrayAsync();
-    }
   }
 }

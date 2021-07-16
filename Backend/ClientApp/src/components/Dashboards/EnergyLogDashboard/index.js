@@ -12,7 +12,6 @@ export default function EnergyLogDashboard(props) {
   const [stateXy, setStateXy] = useState({
     xyTotalKwh: [],
     xyTotalDuration: [],
-    xyDays: [],
     logsRecent: [],
     totalKwh: 0.00,
     totalDuration: 0.00
@@ -126,7 +125,7 @@ export default function EnergyLogDashboard(props) {
 
   const onSelectedXyDay = (selectedDay) => {
     if (stateLoading) return;
-    const [year, month, day] = selectedDay.split("/");
+    const [year, month, day] = selectedDay.split("-");
     setStateSelectedXyDay({ year, month, day });
     setStateLoading(true);
   }
@@ -139,7 +138,6 @@ export default function EnergyLogDashboard(props) {
         sensors={stateSensors.sensors}
         onSelectedSensor={onSelectedSensor}
         selectedDay={stateSelectedXyDay}
-        days={stateXy.xyDays}
         onSelectedDay={onSelectedXyDay}
         chartMetrics={[
           { key: CHART_XY_KWH, title: "Kwh", selected: stateChartXyMetric === CHART_XY_KWH, value: stateXy.totalKwh.toFixed(2) },
