@@ -8,8 +8,9 @@ import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizat
 import { ApplicationPaths } from './components/api-authorization/ApiAuthorizationConstants';
 import SensorNew from './components/Sensors/SensorNew'
 import Dashboards from './components/Dashboards'
-
+import 'antd/dist/antd.css';
 import './custom.css'
+
 
 export default function App(props) {
   return (

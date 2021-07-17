@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "antd": "^4.16.7",
     "bootstrap": "^4.6.0",
     "chart.js": "^2.9.4",
     "jquery": "^3.5.1",

@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import DashboardToolbar from '../components/Toolbar'
+import moment from 'moment';
 import Chart from "chart.js";
 var chartXy = null;
 export default function EnergyLogDashboard(props) {
 
   const [CHART_XY_KWH, CHART_XY_DURATION] = ["CHART_XY_KWH", "CHART_XY_DURATION"];
-  const toDay = new Date();
-  const [dafaultYear, dafaultMonth, defautlDay] = [toDay.getFullYear(), toDay.getMonth() + 1, toDay.getDate()];
   const [stateLoading, setStateLoading] = useState(true);
   const [stateSensors, setStateSensors] = useState({ sensors: [], selectedSensor: null });
   const [stateXy, setStateXy] = useState({
@@ -16,7 +15,7 @@ export default function EnergyLogDashboard(props) {
     totalKwh: 0.00,
     totalDuration: 0.00
   });
-  const [stateSelectedXyDay, setStateSelectedXyDay] = useState({ year: dafaultYear, month: dafaultMonth, day: defautlDay });
+  const [stateSelectedXyDay, setStateSelectedXyDay] = useState(moment(new Date(), 'YYYY/MM/DD'));
   const [stateChartXyMetric, setStateChartXyMetric] = useState(CHART_XY_KWH);
   const [stateRefresh, setStateRefresh] = useState(0);
   var canvaChartRef = React.createRef();
@@ -52,8 +51,7 @@ export default function EnergyLogDashboard(props) {
     async function populateDashboardData(selectedSensor) {
       if (!selectedSensor) return false;
       const sensorId = selectedSensor.id;
-      const { year, month, day } = stateSelectedXyDay;
-      const response = await fetch(`api/sensor/${sensorId}/dashboard/${year}/${month}/${day}`, {
+      const response = await fetch(`api/sensor/${sensorId}/dashboard/${stateSelectedXyDay}`, {
         headers: !props.token ? {} : { 'Authorization': `Bearer ${props.token}` }
       });
       const data = await response.json();
@@ -125,8 +123,7 @@ export default function EnergyLogDashboard(props) {
 
   const onSelectedXyDay = (selectedDay) => {
     if (stateLoading) return;
-    const [year, month, day] = selectedDay.split("-");
-    setStateSelectedXyDay({ year, month, day });
+    setStateSelectedXyDay(selectedDay);
     setStateLoading(true);
   }
 
