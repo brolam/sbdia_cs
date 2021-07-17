@@ -15,7 +15,7 @@ export default function EnergyLogDashboard(props) {
     totalKwh: 0.00,
     totalDuration: 0.00
   });
-  const [stateSelectedXyDay, setStateSelectedXyDay] = useState(moment(new Date(), 'YYYY/MM/DD'));
+  const [stateSelectedXyDay, setStateSelectedXyDay] = useState(moment(new Date()).format('YYYY/MM/DD'));
   const [stateChartXyMetric, setStateChartXyMetric] = useState(CHART_XY_KWH);
   const [stateRefresh, setStateRefresh] = useState(0);
   var canvaChartRef = React.createRef();
